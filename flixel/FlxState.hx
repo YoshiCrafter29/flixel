@@ -88,6 +88,8 @@ class FlxState extends FlxGroup
 	 */
 	public function create():Void {}
 
+    public function createPost():Void {}
+
 	override public function draw():Void
 	{
 		if (persistentDraw || subState == null)

@@ -1,5 +1,6 @@
 package flixel.graphics;
 
+import haxe.Exception;
 import flash.display.BitmapData;
 import flixel.FlxG;
 import flixel.graphics.frames.FlxAtlasFrames;
@@ -26,6 +27,8 @@ class FlxGraphic implements IFlxDestroyable
 	 * at creation if none is specified in the constructor.
 	 */
 	public static var defaultPersist:Bool = false;
+
+    public var hasJustBeenAdded:Bool = true;
 
 	/**
 	 * Creates and caches FlxGraphic object from openfl.Assets key string.

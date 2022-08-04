@@ -1,3 +1,9 @@
+/*
+ -- YOSHI ENGINE FIXES --
+ Fixed weird bar chunk filling
+ Fixed percentage returning floor of percentage instead of the percentage itself
+*/
+
 package flixel.ui;
 
 import flash.display.BitmapData;
@@ -53,6 +59,11 @@ class FlxBar extends FlxSprite
 	 * The percentage of how full the bar is (a value between 0 and 100)
 	 */
 	public var percent(get, set):Float;
+
+	/**
+	 * The percentage of how full the bar is (a value between 0 and 100)
+	 */
+	public var floorPercent(get, null):Int;
 
 	/**
 	 * The current value - must always be between min and max
@@ -754,7 +765,7 @@ class FlxBar extends FlxSprite
 		var percent:Float = fraction * _maxPercent;
 		var maxScale:Float = (_fillHorizontal) ? barWidth : barHeight;
 		var scaleInterval:Float = maxScale / numDivisions;
-		var interval:Float = Math.round(Std.int(fraction * maxScale / scaleInterval) * scaleInterval);
+		var interval:Float = Math.round((fraction * maxScale / scaleInterval) * scaleInterval);
 
 		if (_fillHorizontal)
 		{
@@ -806,7 +817,7 @@ class FlxBar extends FlxSprite
 				if (frontFrames != null)
 				{
 					_filledFlxRect.copyFromFlash(_filledBarRect).round();
-					if (Std.int(percent) > 0)
+					if (floorPercent > 0)
 					{
 						_frontFrame = frontFrames.frame.clipTo(_filledFlxRect, _frontFrame);
 					}
@@ -849,7 +860,7 @@ class FlxBar extends FlxSprite
 		if (alpha == 0)
 			return;
 
-		if (percent > 0 && _frontFrame.type != FlxFrameType.EMPTY)
+		if (floorPercent > 0 && _frontFrame.type != FlxFrameType.EMPTY)
 		{
 			for (camera in cameras)
 			{
@@ -913,7 +924,19 @@ class FlxBar extends FlxSprite
 			return _maxPercent;
 		}
 
-		return Math.floor(((value - min) / range) * _maxPercent);
+        // why the fuck would we need to floor that it's literally returning as a float
+		return ((value - min) / range) * _maxPercent;
+	}
+
+
+	function get_floorPercent():Int
+	{
+		if (value > max)
+		{
+			return _maxPercent;
+		}
+
+		return Math.floor((value - min) / range * _maxPercent);
 	}
 
 	function set_percent(newPct:Float):Float

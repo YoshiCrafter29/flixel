@@ -11,7 +11,9 @@ import haxe.PosInfos;
  */
 class LogFrontEnd
 {
-	/**
+
+	public static var onLogs:Dynamic->LogStyle->Bool->Void;
+	/**	
 	 * Whether everything you trace() is being redirected into the log window.
 	 */
 	public var redirectTraces(default, set):Bool = false;
@@ -20,30 +22,22 @@ class LogFrontEnd
 
 	public inline function add(Data:Dynamic):Void
 	{
-		#if FLX_DEBUG
 		advanced(Data, LogStyle.NORMAL);
-		#end
 	}
 
 	public inline function warn(Data:Dynamic):Void
 	{
-		#if FLX_DEBUG
 		advanced(Data, LogStyle.WARNING, true);
-		#end
 	}
 
 	public inline function error(Data:Dynamic):Void
 	{
-		#if FLX_DEBUG
 		advanced(Data, LogStyle.ERROR, true);
-		#end
 	}
 
 	public inline function notice(Data:Dynamic):Void
 	{
-		#if FLX_DEBUG
 		advanced(Data, LogStyle.NOTICE);
-		#end
 	}
 
 	/**
@@ -96,6 +90,9 @@ class LogFrontEnd
 			}
 		}
 		#end
+
+		if (onLogs != null)
+			onLogs(Data, Style, FireOnce);
 	}
 
 	/**

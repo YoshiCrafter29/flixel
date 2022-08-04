@@ -1,3 +1,8 @@
+/**
+    Yoshi Engine fixes:
+    - Added the prefix variable for Character Editor
+**/
+
 package flixel.animation;
 
 import flixel.FlxG;
@@ -7,6 +12,11 @@ import flixel.FlxG;
  */
 class FlxAnimation extends FlxBaseAnimation
 {
+    /**
+        Animation prefix used during the creation
+    **/
+    
+    public var prefix:String = null;
 	/**
 	 * Animation frameRate - the speed in frames per second that the animation should play at.
 	 */
@@ -82,6 +92,7 @@ class FlxAnimation extends FlxBaseAnimation
 	{
 		super(Parent, Name);
 
+        // name = Name;
 		frameRate = FrameRate;
 		frames = Frames;
 		looped = Looped;

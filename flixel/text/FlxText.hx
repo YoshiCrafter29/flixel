@@ -562,12 +562,13 @@ class FlxText extends FlxSprite
 
 	function set_text(Text:String):String
 	{
-		text = Text;
-		if (textField != null)
-		{
-			var ot:String = textField.text;
-			textField.text = Text;
-			_regen = (textField.text != ot) || _regen;
+		if (text != (text = Text)) {
+			if (textField != null)
+			{
+				var ot:String = textField.text;
+				textField.text = Text;
+				_regen = (textField.text != ot) || _regen;
+			}
 		}
 		return Text;
 	}
@@ -800,6 +801,12 @@ class FlxText extends FlxSprite
 			// Need to generate a new buffer to store the text graphic
 			height = newHeight;
 			var key:String = FlxG.bitmap.getUniqueKey("text");
+            // if (graphic != null) {
+            //     FlxG.bitmap.
+            // }
+			if (graphic != null) {
+				FlxG.bitmap.remove(graphic);
+			}
 			makeGraphic(Std.int(newWidth), Std.int(newHeight), FlxColor.TRANSPARENT, false, key);
 
 			if (_hasBorderAlpha)
@@ -871,12 +878,6 @@ class FlxText extends FlxSprite
 
 			return;
 		}
-		#elseif !web
-		// Fix to render desktop and mobile text in the same visual location as web
-		_matrix.translate(-1, -1); // left and up
-		graphic.draw(textField, _matrix);
-		_matrix.translate(1, 1); // return to center
-		return;
 		#end
 
 		graphic.draw(textField, _matrix);

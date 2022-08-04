@@ -325,6 +325,7 @@ class FlxAnimationController implements IFlxDestroyable
 			if (frameIndices.length > 0)
 			{
 				var anim:FlxAnimation = new FlxAnimation(this, Name, frameIndices, FrameRate, Looped, FlipX, FlipY);
+                anim.prefix = Prefix;
 				_animations.set(Name, anim);
 			}
 		}
@@ -381,6 +382,7 @@ class FlxAnimationController implements IFlxDestroyable
 			if (frameIndices.length > 0)
 			{
 				var anim:FlxAnimation = new FlxAnimation(this, Name, frameIndices, FrameRate, Looped, FlipX, FlipY);
+                anim.prefix = Prefix;
 				_animations.set(Name, anim);
 			}
 		}
@@ -465,6 +467,7 @@ class FlxAnimationController implements IFlxDestroyable
 				if (frameIndices.length > 0)
 				{
 					var anim:FlxAnimation = new FlxAnimation(this, Name, frameIndices, FrameRate, Looped, FlipX, FlipY);
+                    anim.prefix = Prefix;
 					_animations.set(Name, anim);
 				}
 			}

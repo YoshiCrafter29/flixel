@@ -49,8 +49,8 @@ import flixel.input.FlxAccelerometer;
 import flixel.input.FlxSwipe;
 #end
 #if FLX_POST_PROCESS
-import flixel.util.FlxDestroyUtil;
 import openfl.display.OpenGLView;
+import flixel.util.FlxDestroyUtil;
 
 using flixel.util.FlxArrayUtil;
 #end
@@ -64,6 +64,10 @@ import flixel.system.frontEnds.HTML5FrontEnd;
  */
 class FlxG
 {
+	/**
+	 * Whenever antialiasing should be forced off, even if the `antialiasing` property of the sprite is set to `true`.
+	 */
+	public static var forceNoAntialiasing = false;
 	/**
 	 * Whether the game should be paused when focus is lost or not. Use `-D FLX_NO_FOCUS_LOST_SCREEN`
 	 * if you only want to get rid of the default pause screen.
@@ -99,7 +103,7 @@ class FlxG
 	 * The HaxeFlixel version, in semantic versioning syntax. Use `Std.string()`
 	 * on it to get a `String` formatted like this: `"HaxeFlixel MAJOR.MINOR.PATCH-COMMIT_SHA"`.
 	 */
-	public static var VERSION(default, null):FlxVersion = new FlxVersion(5, 0, 0);
+	public static var VERSION(default, null):FlxVersion = new FlxVersion(4, 11, 0);
 
 	/**
 	 * Internal tracker for game object.
@@ -139,6 +143,11 @@ class FlxG
 	 * @since 4.2.0
 	 */
 	public static var onMobile(get, never):Bool;
+
+    /**
+        For correct text input (YoshiCrafter Engine ftw)
+    **/
+    public static var textInput:TextInput;
 
 	public static var renderMethod(default, null):FlxRenderMethod;
 
@@ -313,6 +322,7 @@ class FlxG
 
 	public static var initialWidth(default, null):Int = 0;
 	public static var initialHeight(default, null):Int = 0;
+	public static var initialZoom(default, null):Float = 0;
 
 	#if FLX_SOUND_SYSTEM
 	/**
@@ -570,7 +580,7 @@ class FlxG
 	 * Called by `FlxGame` to set up `FlxG` during `FlxGame`'s constructor.
 	 */
 	@:allow(flixel.FlxGame.new)
-	static function init(Game:FlxGame, Width:Int, Height:Int):Void
+	static function init(Game:FlxGame, Width:Int, Height:Int, Zoom:Float):Void
 	{
 		game = Game;
 		width = Std.int(Math.abs(Width));
@@ -580,6 +590,7 @@ class FlxG
 
 		FlxG.initialWidth = width;
 		FlxG.initialHeight = height;
+		FlxG.initialZoom = FlxCamera.defaultZoom = Zoom;
 
 		resizeGame(Lib.current.stage.stageWidth, Lib.current.stage.stageHeight);
 
@@ -607,8 +618,7 @@ class FlxG
 		#if FLX_ACCELEROMETER
 		accelerometer = new FlxAccelerometer();
 		#end
-
-		initSave();
+		save.bind("flixel");
 
 		plugins = new PluginFrontEnd();
 		vcr = new VCRFrontEnd();
@@ -616,6 +626,8 @@ class FlxG
 		#if FLX_SOUND_SYSTEM
 		sound = new SoundFrontEnd();
 		#end
+
+        textInput = new TextInput();
 	}
 
 	static function initRenderMethod():Void
@@ -660,20 +672,6 @@ class FlxG
 		renderTile = renderMethod == DRAW_TILES;
 
 		FlxObject.defaultPixelPerfectPosition = renderBlit;
-	}
-
-	static function initSave()
-	{
-		// Don't init if the FlxG.save.bind was manually called before the FlxGame was created
-		if (save.isBound)
-			return;
-
-		// Use Project.xml data to determine save id (since 5.0.0).
-		final name = stage.application.meta["file"];
-		save.bind(FlxSave.validate(name));
-		// look for the pre 5.0 save and convert it if it exists.
-		if (save.isEmpty())
-			save.mergeDataFrom("flixel", null, false, false);
 	}
 
 	/**

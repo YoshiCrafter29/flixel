@@ -1,5 +1,12 @@
+/*
+ -- YOSHI ENGINE FIXES --
+ Fixed following scrolling speed being different based on FPS.
+ Fixed Shader resizing problem (fix from hazard24)
+*/
+
 package flixel;
 
+import flixel.graphics.tile.FlxGraphicsShader;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.DisplayObject;
@@ -23,6 +30,7 @@ import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxSpriteUtil;
 import openfl.display.BlendMode;
 import openfl.filters.BitmapFilter;
+import openfl.filters.ShaderFilter;
 import openfl.Vector;
 
 using flixel.util.FlxColorTransformUtil;
@@ -44,10 +52,22 @@ private typedef FlxDrawItem = #if FLX_DRAW_QUADS flixel.graphics.tile.FlxDrawQua
  */
 class FlxCamera extends FlxBasic
 {
+	public function addShader(shader:FlxShader) {
+		var filter:ShaderFilter = null;
+		if (_filters == null) _filters = [];
+		_filters.push(filter = new ShaderFilter(shader));
+		return filter;
+	}
 	/**
-	 * Any `FlxCamera` with a zoom of 0 (the default value) will have this zoom value.
+	 * Whenever the camera follow is active. Used for pause.
 	 */
-	public static var defaultZoom:Float = 1.0;
+	public var followActive:Bool = true;
+
+	/**
+	 * While you can alter the zoom of each camera after the fact,
+	 * this variable determines what value the camera will start at when created.
+	 */
+	public static var defaultZoom:Float;
 
 	/**
 	 * Used behind-the-scenes during the draw phase so that members use the same default
@@ -128,10 +148,11 @@ class FlxCamera extends FlxBasic
 	/**
 	 * Used to smoothly track the camera as it follows:
 	 * The percent of the distance to the follow `target` the camera moves per 1/60 sec.
-	 * Values are bounded between `0.0` and `FlxG.updateFrameRate / 60` for consistency across framerates.
+	 * Values are bounded between `0.0` and `1.0`.
+	 * `elapsed` is used during `update` calls for consistency across framerates.
 	 * The maximum value means no camera easing. A value of `0` means the camera does not move.
 	 */
-	public var followLerp(default, set):Float = 60 / FlxG.updateFramerate;
+	public var followLerp(default, set):Float = 1;
 
 	/**
 	 * You can assign a "dead zone" to the camera in order to better control its movement.
@@ -1046,9 +1067,9 @@ class FlxCamera extends FlxBasic
 	override public function update(elapsed:Float):Void
 	{
 		// follow the target, if there is one
-		if (target != null)
+		if (target != null && followActive)
 		{
-			updateFollow();
+			updateFollow(elapsed);
 		}
 
 		updateScroll();
@@ -1059,6 +1080,18 @@ class FlxCamera extends FlxBasic
 
 		updateFlashSpritePosition();
 		updateShake(elapsed);
+
+		if (filtersEnabled && flashSprite.filters != null) {
+			for(f in flashSprite.filters) {
+				if (Std.isOfType(f, ShaderFilter)) {
+					var f2 = cast(f, ShaderFilter);
+					if (Std.isOfType(f2.shader, FlxGraphicsShader)) {
+						var shader = cast(f2.shader, FlxGraphicsShader);
+						shader.setCamSize(_scrollRect.scrollRect.x, _scrollRect.scrollRect.y, _scrollRect.scrollRect.width, _scrollRect.scrollRect.height);
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -1067,6 +1100,9 @@ class FlxCamera extends FlxBasic
 	 */
 	public function updateScroll():Void
 	{
+		// Adjust bounds to account for zoom
+		var zoom = this.zoom / FlxG.initialZoom;
+
 		var minX:Null<Float> = minScrollX == null ? null : minScrollX - (zoom - 1) * width / (2 * zoom);
 		var maxX:Null<Float> = maxScrollX == null ? null : maxScrollX + (zoom - 1) * width / (2 * zoom);
 		var minY:Null<Float> = minScrollY == null ? null : minScrollY - (zoom - 1) * height / (2 * zoom);
@@ -1081,7 +1117,7 @@ class FlxCamera extends FlxBasic
 	 * Updates camera's scroll.
 	 * Called every frame by camera's `update()` method (if camera's `target` isn't `null`).
 	 */
-	public function updateFollow():Void
+	public function updateFollow(elapsed:Float):Void
 	{
 		// Either follow the object closely,
 		// or double check our deadzone and update accordingly.
@@ -1161,8 +1197,8 @@ class FlxCamera extends FlxBasic
 			}
 			else
 			{
-				scroll.x += (_scrollTarget.x - scroll.x) * followLerp * FlxG.updateFramerate / 60;
-				scroll.y += (_scrollTarget.y - scroll.y) * followLerp * FlxG.updateFramerate / 60;
+                scroll.x = FlxMath.lerp(scroll.x, _scrollTarget.x, FlxMath.bound(followLerp * 60 * elapsed, 0, 1));
+				scroll.y = FlxMath.lerp(scroll.y, _scrollTarget.y, FlxMath.bound(followLerp * 60 * elapsed, 0, 1));
 			}
 		}
 	}
@@ -1226,11 +1262,11 @@ class FlxCamera extends FlxBasic
 			}
 			else
 			{
-				if (_fxShakeAxes.x)
+				if (_fxShakeAxes != FlxAxes.Y)
 				{
 					flashSprite.x += FlxG.random.float(-_fxShakeIntensity * width, _fxShakeIntensity * width) * zoom * FlxG.scaleMode.scale.x;
 				}
-				if (_fxShakeAxes.y)
+				if (_fxShakeAxes != FlxAxes.X)
 				{
 					flashSprite.y += FlxG.random.float(-_fxShakeIntensity * height, _fxShakeIntensity * height) * zoom * FlxG.scaleMode.scale.y;
 				}
@@ -1271,6 +1307,13 @@ class FlxCamera extends FlxBasic
 	 */
 	function updateScrollRect():Void
 	{
+		// TODO!!
+		/*
+		FlxG.camera._scrollRect.x = -(FlxG.camera.width * FlxG.camera.initialZoom * FlxG.scaleMode.scale.x * 0.5);
+		FlxG.camera._scrollRect.y = -(FlxG.camera.height * FlxG.camera.initialZoom * FlxG.scaleMode.scale.y * 0.5);
+		FlxG.camera._scrollRect.scrollRect = null;
+		*/
+		
 		var rect:Rectangle = (_scrollRect != null) ? _scrollRect.scrollRect : null;
 
 		if (rect != null)
@@ -1389,7 +1432,7 @@ class FlxCamera extends FlxBasic
 	 */
 	public function snapToTarget():Void
 	{
-		updateFollow();
+		updateFollow(0);
 		scroll.copyFrom(_scrollTarget);
 	}
 
@@ -1781,7 +1824,7 @@ class FlxCamera extends FlxBasic
 
 	function set_followLerp(Value:Float):Float
 	{
-		return followLerp = FlxMath.bound(Value, 0, 60 / FlxG.updateFramerate);
+		return followLerp = FlxMath.bound(Value, 0, 1);
 	}
 
 	function set_width(Value:Int):Int
