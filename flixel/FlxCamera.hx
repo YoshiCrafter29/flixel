@@ -1,8 +1,8 @@
 /*
- -- YOSHI ENGINE FIXES --
- Fixed following scrolling speed being different based on FPS.
- Fixed Shader resizing problem (fix from hazard24)
-*/
+	-- YOSHI ENGINE FIXES --
+	Fixed following scrolling speed being different based on FPS.
+	Fixed Shader resizing problem (fix from hazard24)
+ */
 
 package flixel;
 
@@ -52,12 +52,28 @@ private typedef FlxDrawItem = #if FLX_DRAW_QUADS flixel.graphics.tile.FlxDrawQua
  */
 class FlxCamera extends FlxBasic
 {
-	public function addShader(shader:FlxShader) {
+	public function addShader(shader:FlxShader)
+	{
 		var filter:ShaderFilter = null;
-		if (_filters == null) _filters = [];
+		if (_filters == null)
+			_filters = [];
 		_filters.push(filter = new ShaderFilter(shader));
 		return filter;
 	}
+
+	/**
+	 * Whenever the camera should be widescreen or not.
+	 * If null, will use the `FlxG.widescreen` variable.
+	 */
+	public var widescreen(default, set):Null<Bool> = null;
+
+	private function set_widescreen(v:Null<Bool>)
+	{
+		if (widescreen != (widescreen = v))
+			updateScrollRect();
+		return widescreen;
+	}
+
 	/**
 	 * Whenever the camera follow is active. Used for pause.
 	 */
@@ -80,7 +96,7 @@ class FlxCamera extends FlxBasic
 	 */
 	@:deprecated("`FlxCamera.defaultCameras` is deprecated, use `FlxG.cameras.setDefaultDrawTarget` instead")
 	public static var defaultCameras(get, set):Array<FlxCamera>;
-	
+
 	/**
 	 * Used behind-the-scenes during the draw phase so that members use the same default
 	 * cameras as their parent.
@@ -1081,13 +1097,34 @@ class FlxCamera extends FlxBasic
 		updateFlashSpritePosition();
 		updateShake(elapsed);
 
-		if (filtersEnabled && flashSprite.filters != null) {
-			for(f in flashSprite.filters) {
-				if (Std.isOfType(f, ShaderFilter)) {
+		if (filtersEnabled && flashSprite.filters != null)
+		{
+			for (f in flashSprite.filters)
+			{
+				if (Std.isOfType(f, ShaderFilter))
+				{
 					var f2 = cast(f, ShaderFilter);
-					if (Std.isOfType(f2.shader, FlxGraphicsShader)) {
+					if (Std.isOfType(f2.shader, FlxGraphicsShader))
+					{
 						var shader = cast(f2.shader, FlxGraphicsShader);
-						shader.setCamSize(_scrollRect.scrollRect.x, _scrollRect.scrollRect.y, _scrollRect.scrollRect.width, _scrollRect.scrollRect.height);
+
+						var rect = _scrollRect.scrollRect;
+						if (rect == null) {
+							rect = calculateScrollRect();
+
+							rect.x -= canvas.x;
+							rect.y -= canvas.y;
+							rect.x += -((width) * initialZoom * FlxG.scaleMode.scale.x * 0.5);
+							rect.y += -((height) * initialZoom * FlxG.scaleMode.scale.y * 0.5);
+							// rect.width += ((viewOffsetWidth - viewOffsetX) * initialZoom * FlxG.scaleMode.scale.x * 0.5);
+							// rect.height += ((viewOffsetHeight - viewOffsetX) * initialZoom * FlxG.scaleMode.scale.y * 0.5);
+							// rect.x -= _scrollRect.x;
+							// rect.y -= _scrollRect.y;
+							// rect.width += _scrollRect.x * 2;
+							// rect.height += _scrollRect.x * 2;
+						}
+						if (rect != null)
+							shader.setCamSize(rect.x, rect.y, rect.width, rect.height);
 					}
 				}
 			}
@@ -1197,7 +1234,7 @@ class FlxCamera extends FlxBasic
 			}
 			else
 			{
-                scroll.x = FlxMath.lerp(scroll.x, _scrollTarget.x, FlxMath.bound(followLerp * 60 * elapsed, 0, 1));
+				scroll.x = FlxMath.lerp(scroll.x, _scrollTarget.x, FlxMath.bound(followLerp * 60 * elapsed, 0, 1));
 				scroll.y = FlxMath.lerp(scroll.y, _scrollTarget.y, FlxMath.bound(followLerp * 60 * elapsed, 0, 1));
 			}
 		}
@@ -1307,27 +1344,30 @@ class FlxCamera extends FlxBasic
 	 */
 	function updateScrollRect():Void
 	{
-		// TODO!!
-		/*
-		FlxG.camera._scrollRect.x = -(FlxG.camera.width * FlxG.camera.initialZoom * FlxG.scaleMode.scale.x * 0.5);
-		FlxG.camera._scrollRect.y = -(FlxG.camera.height * FlxG.camera.initialZoom * FlxG.scaleMode.scale.y * 0.5);
-		FlxG.camera._scrollRect.scrollRect = null;
-		*/
-		
-		var rect:Rectangle = (_scrollRect != null) ? _scrollRect.scrollRect : null;
-
-		if (rect != null)
+		if (widescreen == null ? FlxG.widescreen : widescreen)
 		{
+			_scrollRect.scrollRect = null;
+		}
+		else
+		{
+			_scrollRect.scrollRect = calculateScrollRect();
+		}
+		_scrollRect.x = -(width * initialZoom * FlxG.scaleMode.scale.x * 0.5);
+		_scrollRect.y = -(height * initialZoom * FlxG.scaleMode.scale.y * 0.5);
+	}
+
+	function calculateScrollRect()
+	{
+		if (_scrollRect != null)
+		{
+			var rect:Rectangle = (_scrollRect.scrollRect != null) ? _scrollRect.scrollRect : new Rectangle();
 			rect.x = rect.y = 0;
 
 			rect.width = width * initialZoom * FlxG.scaleMode.scale.x;
 			rect.height = height * initialZoom * FlxG.scaleMode.scale.y;
-
-			_scrollRect.scrollRect = rect;
-
-			_scrollRect.x = -0.5 * rect.width;
-			_scrollRect.y = -0.5 * rect.height;
+			return rect;
 		}
+		return null;
 	}
 
 	/**
@@ -1784,7 +1824,7 @@ class FlxCamera extends FlxBasic
 		updateFlashOffset();
 		setScale(scaleX, scaleY);
 	}
-	
+
 	/**
 	 * The size and position of this camera's screen
 	 * @since 4.11.0
@@ -1793,10 +1833,10 @@ class FlxCamera extends FlxBasic
 	{
 		if (rect == null)
 			rect = FlxRect.get();
-		
+
 		return rect.set(viewOffsetX, viewOffsetY, viewOffsetWidth - viewOffsetX, viewOffsetHeight - viewOffsetY);
 	}
-	
+
 	/**
 	 * Checks whether this camera contains a given point or rectangle, in
 	 * screen coordinates.
@@ -1804,20 +1844,50 @@ class FlxCamera extends FlxBasic
 	 */
 	public inline function containsPoint(point:FlxPoint, width:Float = 0, height:Float = 0):Bool
 	{
-		var contained = (point.x + width > viewOffsetX) && (point.x < viewOffsetWidth)
-			&& (point.y + height > viewOffsetY) && (point.y < viewOffsetHeight);
+		var offsetX = viewOffsetX;
+		var offsetY = viewOffsetY;
+		var offsetW = viewOffsetWidth;
+		var offsetH = viewOffsetHeight;
+		if (widescreen == null ? FlxG.widescreen : widescreen)
+		{
+			var wRatio = (width - (FlxG.stage.width)) * FlxG.scaleMode.scale.x;
+			var hRatio = (height - (FlxG.stage.height)) * FlxG.scaleMode.scale.y;
+
+			offsetX -= wRatio;
+			offsetW += wRatio;
+
+			offsetY -= hRatio;
+			offsetH += hRatio;
+		}
+
+		var contained = (point.x + width > offsetX) && (point.x < offsetW) && (point.y + height > offsetY) && (point.y < offsetH);
 		point.putWeak();
 		return contained;
 	}
-	
+
 	/**
 	 * Checks whether this camera contains a given rectangle, in screen coordinates.
 	 * @since 4.11.0
 	 */
 	public inline function containsRect(rect:FlxRect):Bool
 	{
-		var contained = (rect.right > viewOffsetX) && (rect.x < viewOffsetWidth)
-			&& (rect.bottom > viewOffsetY) && (rect.y < viewOffsetHeight);
+		var offsetX = viewOffsetX;
+		var offsetY = viewOffsetY;
+		var offsetW = viewOffsetWidth;
+		var offsetH = viewOffsetHeight;
+		if (widescreen == null ? FlxG.widescreen : widescreen)
+		{
+			var wRatio = (width - (FlxG.stage.width)) * FlxG.scaleMode.scale.x / 2;
+			var hRatio = (height - (FlxG.stage.height)) * FlxG.scaleMode.scale.y / 2;
+
+			offsetX += wRatio;
+			offsetW -= wRatio;
+
+			offsetY += hRatio;
+			offsetH -= hRatio;
+		}
+
+		var contained = (rect.right > offsetX) && (rect.x < offsetW) && (rect.bottom > offsetY) && (rect.y < offsetH);
 		rect.putWeak();
 		return contained;
 	}
@@ -1965,12 +2035,12 @@ class FlxCamera extends FlxBasic
 		viewOffsetHeight = height - viewOffsetY;
 		viewHeight = height - 2 * viewOffsetY;
 	}
-	
+
 	static inline function get_defaultCameras():Array<FlxCamera>
 	{
 		return _defaultCameras;
 	}
-	
+
 	static inline function set_defaultCameras(value:Array<FlxCamera>):Array<FlxCamera>
 	{
 		return _defaultCameras = value;

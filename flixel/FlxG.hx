@@ -65,9 +65,26 @@ import flixel.system.frontEnds.HTML5FrontEnd;
 class FlxG
 {
 	/**
+	 * Whenever black bars for cameras shouldn't show up.
+	 */
+	public static var widescreen(default, set):Bool = false;
+
+	private static function set_widescreen(v:Bool)
+	{
+		widescreen = v;
+		for (e in FlxG.cameras.list)
+		{
+			@:privateAccess
+			e.updateScrollRect();
+		}
+		return widescreen;
+	}
+
+	/**
 	 * Whenever antialiasing should be forced off, even if the `antialiasing` property of the sprite is set to `true`.
 	 */
 	public static var forceNoAntialiasing = false;
+
 	/**
 	 * Whether the game should be paused when focus is lost or not. Use `-D FLX_NO_FOCUS_LOST_SCREEN`
 	 * if you only want to get rid of the default pause screen.
@@ -144,10 +161,10 @@ class FlxG
 	 */
 	public static var onMobile(get, never):Bool;
 
-    /**
-        For correct text input (YoshiCrafter Engine ftw)
-    **/
-    public static var textInput:TextInput;
+	/**
+		For correct text input (YoshiCrafter Engine ftw)
+	**/
+	public static var textInput:TextInput;
 
 	public static var renderMethod(default, null):FlxRenderMethod;
 
@@ -627,7 +644,7 @@ class FlxG
 		sound = new SoundFrontEnd();
 		#end
 
-        textInput = new TextInput();
+		textInput = new TextInput();
 	}
 
 	static function initRenderMethod():Void
