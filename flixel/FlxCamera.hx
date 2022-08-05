@@ -1862,16 +1862,24 @@ class FlxCamera extends FlxBasic
 		var offsetY = viewOffsetY;
 		var offsetW = viewOffsetWidth;
 		var offsetH = viewOffsetHeight;
+		
 		if (widescreen == null ? FlxG.widescreen : widescreen)
 		{
-			var wRatio = (width - (FlxG.stage.width)) * FlxG.scaleMode.scale.x;
-			var hRatio = (height - (FlxG.stage.height)) * FlxG.scaleMode.scale.y;
+			var w2:Float = Application.current.window.width;
+			var h2:Float = Application.current.window.height;
 
-			offsetX -= wRatio;
-			offsetW += wRatio;
+			
+			var w = width * (initialZoom) * FlxG.scaleMode.scale.x;
+			var h = height * (initialZoom) * FlxG.scaleMode.scale.y;
 
-			offsetY -= hRatio;
-			offsetH += hRatio;
+			var wRatio = (w - (w2)) * FlxG.scaleMode.scale.x;
+			var hRatio = (h - (h2)) * FlxG.scaleMode.scale.y;
+
+			offsetX += wRatio * 2;
+			offsetW -= wRatio * 2;
+
+			offsetY += hRatio * 2;
+			offsetH -= hRatio * 2;
 		}
 
 		var contained = (point.x + width > offsetX) && (point.x < offsetW) && (point.y + height > offsetY) && (point.y < offsetH);
@@ -1889,16 +1897,24 @@ class FlxCamera extends FlxBasic
 		var offsetY = viewOffsetY;
 		var offsetW = viewOffsetWidth;
 		var offsetH = viewOffsetHeight;
+		
 		if (widescreen == null ? FlxG.widescreen : widescreen)
 		{
-			var wRatio = (width - (FlxG.stage.width)) * FlxG.scaleMode.scale.x / 2;
-			var hRatio = (height - (FlxG.stage.height)) * FlxG.scaleMode.scale.y / 2;
+			var w2:Float = Application.current.window.width;
+			var h2:Float = Application.current.window.height;
 
-			offsetX += wRatio;
-			offsetW -= wRatio;
+			
+			var w = width * (initialZoom) * FlxG.scaleMode.scale.x;
+			var h = height * (initialZoom) * FlxG.scaleMode.scale.y;
 
-			offsetY += hRatio;
-			offsetH -= hRatio;
+			var wRatio = (w - (w2)) * FlxG.scaleMode.scale.x;
+			var hRatio = (h - (h2)) * FlxG.scaleMode.scale.y;
+
+			offsetX += wRatio * 2;
+			offsetW -= wRatio * 2;
+
+			offsetY += hRatio * 2;
+			offsetH -= hRatio * 2;
 		}
 
 		var contained = (rect.right > offsetX) && (rect.x < offsetW) && (rect.bottom > offsetY) && (rect.y < offsetH);
