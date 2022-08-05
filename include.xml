@@ -4,6 +4,9 @@
 
 	<icon path="assets/images/logo/HaxeFlixel.svg" priority="-10" />
 	
+	<!-- This prevents a bug in neko where inlined functions exceed the max code length -->
+	<haxedef name="NAPE_NO_INLINE" if="neko" />
+
 	<section unless="unit-test">
 		<assets path="assets/sounds" rename="flixel/sounds" include="*.mp3" if="web || air" embed="true" />
 		<assets path="assets/sounds" rename="flixel/sounds" include="*.ogg" unless="flash || air" embed="true" />
@@ -16,6 +19,10 @@
 		<assets path="assets/images/ui/button.png" rename="flixel/images/ui/button.png" embed="true" />
 		<assets path="assets/images/logo/default.png" rename="flixel/images/logo/default.png" embed="true" />
 	</section>
+
+
+	<assets path="assets-ui/images" rename="flixel/flixel-ui/img" embed="true" />
+	<assets path="assets-ui/xml" rename="flixel/flixel-ui/xml" embed="true" />
 	
 	<set name="legacy" unless="next" />
 	

@@ -9,6 +9,14 @@
 [![Haxelib License](https://badgen.net/haxelib/license/flixel)](LICENSE.md)
 [![Patreon](https://img.shields.io/badge/donate-patreon-blue.svg)](https://www.patreon.com/haxeflixel) 
 
+
+
+## Purpose of this fork
+This fork contains many bug fixes and enhancements that have been done for projects such as YoshiCrafter Engine.
+## Warnings
+- It doesn't contains **every** enhancement made for YoshiCrafter Engine (FlxSound pitch and fast state switching is missing for example).
+- This fork also bundles `flixel-addons` and `flixel-ui` with a few enhancements.
+
 [![](images/showcase.png)](https://haxeflixel.com/showcase)
 
 ## Links
