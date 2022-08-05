@@ -6,6 +6,7 @@
 
 package flixel;
 
+import lime.app.Application;
 import flixel.graphics.tile.FlxGraphicsShader;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
@@ -528,6 +529,11 @@ class FlxCamera extends FlxBasic
 	 * Last draw triangles item
 	 */
 	var _headTriangles:FlxDrawTrianglesItem;
+
+	/**
+     * Scroll Rect (non affected by widescreen)
+	 */
+	var scrlRect:Rectangle;
 
 	/**
 	 * Draw tiles stack items that can be reused
@@ -1099,6 +1105,19 @@ class FlxCamera extends FlxBasic
 
 		if (filtersEnabled && flashSprite.filters != null)
 		{
+			var rect = scrlRect;
+
+			var w = width * initialZoom * FlxG.scaleMode.scale.x;
+			var h = height * initialZoom * FlxG.scaleMode.scale.y;
+
+			if (rect == null) {
+				rect = calculateScrollRect();
+			}
+
+			
+			var w = width * initialZoom * FlxG.scaleMode.scale.x;
+			var h = height * initialZoom * FlxG.scaleMode.scale.y;
+
 			for (f in flashSprite.filters)
 			{
 				if (Std.isOfType(f, ShaderFilter))
@@ -1108,23 +1127,8 @@ class FlxCamera extends FlxBasic
 					{
 						var shader = cast(f2.shader, FlxGraphicsShader);
 
-						var rect = _scrollRect.scrollRect;
-						if (rect == null) {
-							rect = calculateScrollRect();
-
-							rect.x -= canvas.x;
-							rect.y -= canvas.y;
-							rect.x += -((width) * initialZoom * FlxG.scaleMode.scale.x * 0.5);
-							rect.y += -((height) * initialZoom * FlxG.scaleMode.scale.y * 0.5);
-							// rect.width += ((viewOffsetWidth - viewOffsetX) * initialZoom * FlxG.scaleMode.scale.x * 0.5);
-							// rect.height += ((viewOffsetHeight - viewOffsetX) * initialZoom * FlxG.scaleMode.scale.y * 0.5);
-							// rect.x -= _scrollRect.x;
-							// rect.y -= _scrollRect.y;
-							// rect.width += _scrollRect.x * 2;
-							// rect.height += _scrollRect.x * 2;
-						}
 						if (rect != null)
-							shader.setCamSize(rect.x, rect.y, rect.width, rect.height);
+							shader.setCamSize(rect.x + (_scrollRect.x + (w * 0.5)), rect.y + (_scrollRect.y + (h * 0.5)), rect.width - (2 * (_scrollRect.x + (w * 0.5))), rect.height - (2 * (_scrollRect.y + (h * 0.5))));
 					}
 				}
 			}
@@ -1228,7 +1232,7 @@ class FlxCamera extends FlxBasic
 				_lastTargetPosition.y = target.y;
 			}
 
-			if (followLerp >= 60 / FlxG.updateFramerate)
+			if (followLerp >= 1)
 			{
 				scroll.copyFrom(_scrollTarget); // no easing
 			}
@@ -1344,16 +1348,26 @@ class FlxCamera extends FlxBasic
 	 */
 	function updateScrollRect():Void
 	{
-		if (widescreen == null ? FlxG.widescreen : widescreen)
-		{
-			_scrollRect.scrollRect = null;
+		calculateScrollRect();
+
+		var w = width * initialZoom * FlxG.scaleMode.scale.x;
+		var h = height * initialZoom * FlxG.scaleMode.scale.y;
+
+		_scrollRect.x = _scrollRect.y = 0;
+		if (widescreen == null ? FlxG.widescreen : widescreen) {
+			var w2:Float = Application.current.window.width;
+			var h2:Float = Application.current.window.height;
+			var offsetX = (w - w2) / 2;
+			_scrollRect.x += offsetX;
+			var offsetY = (h - h2) / 2;
+			_scrollRect.y += offsetY;
+
+			_scrollRect.scrollRect = new Rectangle(offsetX, offsetY, w2 - offsetX, h2 - offsetY);
+		} else {
+			_scrollRect.scrollRect = scrlRect;
 		}
-		else
-		{
-			_scrollRect.scrollRect = calculateScrollRect();
-		}
-		_scrollRect.x = -(width * initialZoom * FlxG.scaleMode.scale.x * 0.5);
-		_scrollRect.y = -(height * initialZoom * FlxG.scaleMode.scale.y * 0.5);
+		_scrollRect.x -= w * 0.5;
+		_scrollRect.y -= h * 0.5;
 	}
 
 	function calculateScrollRect()
@@ -1365,9 +1379,9 @@ class FlxCamera extends FlxBasic
 
 			rect.width = width * initialZoom * FlxG.scaleMode.scale.x;
 			rect.height = height * initialZoom * FlxG.scaleMode.scale.y;
-			return rect;
+			return scrlRect = rect;
 		}
-		return null;
+		return scrlRect = null;
 	}
 
 	/**
