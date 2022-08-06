@@ -261,7 +261,7 @@ class Window extends Sprite
 	{
 		visible = Value;
 
-		if (!_closable && FlxG.save.isBound)
+		if (!_closable)
 		{
 			FlxG.save.data.windowSettings[_id] = visible;
 			FlxG.save.flush();
@@ -286,9 +286,6 @@ class Window extends Sprite
 
 	function loadSaveData():Void
 	{
-		if (!FlxG.save.isBound)
-			return;
-
 		if (FlxG.save.data.windowSettings == null)
 		{
 			var maxWindows = 10; // arbitrary

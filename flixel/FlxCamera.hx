@@ -68,6 +68,13 @@ class FlxCamera extends FlxBasic
 	 */
 	public var widescreen(default, set):Null<Bool> = null;
 
+	/**
+	 * Widescreen dimensions multipliers
+	 * For example, if the camera is in widescreen mode and the game is in 1920x720 while the camera is in 1280x720,
+	 * the value will be equal to `new FlxPoint(1.5, 1);`.
+	 */
+	public var widescreenMultipliers:FlxPoint = new FlxPoint(0, 0);
+
 	private function set_widescreen(v:Null<Bool>)
 	{
 		if (widescreen != (widescreen = v))
@@ -531,7 +538,7 @@ class FlxCamera extends FlxBasic
 	var _headTriangles:FlxDrawTrianglesItem;
 
 	/**
-     * Scroll Rect (non affected by widescreen)
+	 * Scroll Rect (non affected by widescreen)
 	 */
 	var scrlRect:Rectangle;
 
@@ -1110,11 +1117,11 @@ class FlxCamera extends FlxBasic
 			var w = width * initialZoom * FlxG.scaleMode.scale.x;
 			var h = height * initialZoom * FlxG.scaleMode.scale.y;
 
-			if (rect == null) {
+			if (rect == null)
+			{
 				rect = calculateScrollRect();
 			}
 
-			
 			var w = width * initialZoom * FlxG.scaleMode.scale.x;
 			var h = height * initialZoom * FlxG.scaleMode.scale.y;
 
@@ -1128,7 +1135,12 @@ class FlxCamera extends FlxBasic
 						var shader = cast(f2.shader, FlxGraphicsShader);
 
 						if (rect != null)
-							shader.setCamSize(rect.x + (_scrollRect.x + (w * 0.5)), rect.y + (_scrollRect.y + (h * 0.5)), rect.width - (2 * (_scrollRect.x + (w * 0.5))), rect.height - (2 * (_scrollRect.y + (h * 0.5))));
+							shader.setCamSize(rect.x
+								+ (_scrollRect.x + (w * 0.5)), rect.y
+								+ (_scrollRect.y + (h * 0.5)),
+								rect.width
+								- (2 * (_scrollRect.x + (w * 0.5))), rect.height
+								- (2 * (_scrollRect.y + (h * 0.5))));
 					}
 				}
 			}
@@ -1232,7 +1244,7 @@ class FlxCamera extends FlxBasic
 				_lastTargetPosition.y = target.y;
 			}
 
-			if (followLerp >= 1)
+			if (followLerp >= 1 / 60 / (1 / FlxG.updateFramerate))
 			{
 				scroll.copyFrom(_scrollTarget); // no easing
 			}
@@ -1354,7 +1366,8 @@ class FlxCamera extends FlxBasic
 		var h = height * initialZoom * FlxG.scaleMode.scale.y;
 
 		_scrollRect.x = _scrollRect.y = 0;
-		if (widescreen == null ? FlxG.widescreen : widescreen) {
+		if (widescreen == null ? FlxG.widescreen : widescreen)
+		{
 			var w2:Float = Application.current.window.width;
 			var h2:Float = Application.current.window.height;
 			var offsetX = (w - w2) / 2;
@@ -1363,8 +1376,13 @@ class FlxCamera extends FlxBasic
 			_scrollRect.y += offsetY;
 
 			_scrollRect.scrollRect = new Rectangle(offsetX, offsetY, w2 - offsetX, h2 - offsetY);
-		} else {
+
+			widescreenMultipliers.set(w2 / w, h2 / h);
+		}
+		else
+		{
 			_scrollRect.scrollRect = scrlRect;
+			widescreenMultipliers.set(1, 1);
 		}
 		_scrollRect.x -= w * 0.5;
 		_scrollRect.y -= h * 0.5;
@@ -1638,7 +1656,18 @@ class FlxCamera extends FlxBasic
 			}
 			else
 			{
-				buffer.fillRect(_flashRect, Color);
+				if (widescreen == null ? FlxG.widescreen : widescreen)
+				{
+					var rect = new Rectangle((_flashRect.x * widescreenMultipliers.x) - (1 + ((widescreenMultipliers.x - 1) / 2)),
+						(_flashRect.y * widescreenMultipliers.y) - (1 + ((widescreenMultipliers.y - 1) / 2)), _flashRect.width * widescreenMultipliers.x,
+						_flashRect.height * widescreenMultipliers.y);
+
+					buffer.fillRect(rect, Color);
+				}
+				else
+				{
+					buffer.fillRect(_flashRect, Color);
+				}
 			}
 		}
 		else
@@ -1651,7 +1680,13 @@ class FlxCamera extends FlxBasic
 			targetGraphics.beginFill(Color, FxAlpha);
 			// i'm drawing rect with these parameters to avoid light lines at the top and left of the camera,
 			// which could appear while cameras fading
-			targetGraphics.drawRect(viewOffsetX - 1, viewOffsetY - 1, viewWidth + 2, viewHeight + 2);
+			targetGraphics.drawRect(viewOffsetX
+				- 1
+				- (width * (((widescreenMultipliers.x - 1) / 2))),
+				viewOffsetY
+				- 1
+				- (height * (((widescreenMultipliers.y - 1) / 2))), (viewWidth + 2) * widescreenMultipliers.x,
+				(viewHeight + 2) * widescreenMultipliers.y);
 			targetGraphics.endFill();
 		}
 	}
@@ -1862,13 +1897,12 @@ class FlxCamera extends FlxBasic
 		var offsetY = viewOffsetY;
 		var offsetW = viewOffsetWidth;
 		var offsetH = viewOffsetHeight;
-		
+
 		if (widescreen == null ? FlxG.widescreen : widescreen)
 		{
 			var w2:Float = Application.current.window.width;
 			var h2:Float = Application.current.window.height;
 
-			
 			var w = width * (initialZoom) * FlxG.scaleMode.scale.x;
 			var h = height * (initialZoom) * FlxG.scaleMode.scale.y;
 
@@ -1897,13 +1931,12 @@ class FlxCamera extends FlxBasic
 		var offsetY = viewOffsetY;
 		var offsetW = viewOffsetWidth;
 		var offsetH = viewOffsetHeight;
-		
+
 		if (widescreen == null ? FlxG.widescreen : widescreen)
 		{
 			var w2:Float = Application.current.window.width;
 			var h2:Float = Application.current.window.height;
 
-			
 			var w = width * (initialZoom) * FlxG.scaleMode.scale.x;
 			var h = height * (initialZoom) * FlxG.scaleMode.scale.y;
 
@@ -1924,7 +1957,7 @@ class FlxCamera extends FlxBasic
 
 	function set_followLerp(Value:Float):Float
 	{
-		return followLerp = FlxMath.bound(Value, 0, 1);
+		return followLerp = Math.max(Value, 0);
 	}
 
 	function set_width(Value:Int):Int

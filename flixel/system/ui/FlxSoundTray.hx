@@ -1,16 +1,16 @@
 package flixel.system.ui;
 
 #if FLX_SOUND_SYSTEM
+import flash.display.Bitmap;
+import flash.display.BitmapData;
+import flash.display.Sprite;
+import flash.Lib;
+import flash.text.TextField;
+import flash.text.TextFormat;
+import flash.text.TextFormatAlign;
 import flixel.FlxG;
 import flixel.system.FlxAssets;
 import flixel.util.FlxColor;
-import openfl.Lib;
-import openfl.display.Bitmap;
-import openfl.display.BitmapData;
-import openfl.display.Sprite;
-import openfl.text.TextField;
-import openfl.text.TextFormat;
-import openfl.text.TextFormatAlign;
 #if flash
 import flash.text.AntiAliasType;
 import flash.text.GridFitType;
@@ -42,15 +42,6 @@ class FlxSoundTray extends Sprite
 	var _width:Int = 80;
 
 	var _defaultScale:Float = 2.0;
-
-	/**The sound used when increasing the volume.**/
-	public var volumeUpSound:String = "flixel/sounds/beep";
-
-	/**The sound used when decreasing the volume.**/
-	public var volumeDownSound:String = 'flixel/sounds/beep';
-
-	/**Whether or not changing the volume should make noise.**/
-	public var silent:Bool = false;
 
 	/**
 	 * Sets up the "sound tray", the little volume meter that pops down sometimes.
@@ -126,12 +117,9 @@ class FlxSoundTray extends Sprite
 				active = false;
 
 				// Save sound preferences
-				if (FlxG.save.isBound)
-				{
-					FlxG.save.data.mute = FlxG.sound.muted;
-					FlxG.save.data.volume = FlxG.sound.volume;
-					FlxG.save.flush();
-				}
+				FlxG.save.data.mute = FlxG.sound.muted;
+				FlxG.save.data.volume = FlxG.sound.volume;
+				FlxG.save.flush();
 			}
 		}
 	}
@@ -139,13 +127,13 @@ class FlxSoundTray extends Sprite
 	/**
 	 * Makes the little volume tray slide out.
 	 *
-	 * @param	up Whether the volume is increasing.
+	 * @param	Silent	Whether or not it should beep.
 	 */
-	public function show(up:Bool = false):Void
+	public function show(Silent:Bool = false):Void
 	{
-		if (!silent)
+		if (!Silent)
 		{
-			var sound = FlxAssets.getSound(up ? volumeUpSound : volumeDownSound);
+			var sound = FlxAssets.getSound("flixel/sounds/beep");
 			if (sound != null)
 				FlxG.sound.load(sound).play();
 		}

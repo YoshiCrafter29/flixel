@@ -58,7 +58,6 @@ class WatchEntry extends Sprite implements IFlxDestroyable
 			case FIELD(_, _): 0xFFFFFF;
 			case QUICK(_): 0xA5F1ED;
 			case EXPRESSION(_, _): 0xC4FE83;
-			case FUNCTION(_): 0xF1A5A5;
 		}
 	}
 
@@ -97,7 +96,6 @@ class WatchEntry extends Sprite implements IFlxDestroyable
 			case EXPRESSION(expression, _):
 				setNameText(expression);
 			case QUICK(_):
-			case FUNCTION(_):
 		}
 	}
 
@@ -122,8 +120,6 @@ class WatchEntry extends Sprite implements IFlxDestroyable
 				#end
 			case QUICK(value):
 				value;
-			case FUNCTION(func):
-				func();
 		}
 	}
 

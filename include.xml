@@ -6,6 +6,8 @@
 	
 	<!-- This prevents a bug in neko where inlined functions exceed the max code length -->
 	<haxedef name="NAPE_NO_INLINE" if="neko" />
+	<haxedef name="flixel_addons" />
+	<haxedef name="flixel_ui" />
 
 	<section unless="unit-test">
 		<assets path="assets/sounds" rename="flixel/sounds" include="*.mp3" if="web || air" embed="true" />

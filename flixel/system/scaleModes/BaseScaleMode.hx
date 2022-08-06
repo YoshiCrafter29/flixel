@@ -52,8 +52,8 @@ class BaseScaleMode
 
 	function updateScaleOffset():Void
 	{
-		scale.x = gameSize.x / FlxG.width;
-		scale.y = gameSize.y / FlxG.height;
+		scale.x = gameSize.x / (FlxG.width * FlxG.initialZoom);
+		scale.y = gameSize.y / (FlxG.height * FlxG.initialZoom);
 		updateOffsetX();
 		updateOffsetY();
 	}

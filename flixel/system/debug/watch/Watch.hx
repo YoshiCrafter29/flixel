@@ -62,8 +62,6 @@ class Watch extends Window
 				displayName.isNullOrEmpty();
 			case EXPRESSION(expression, _):
 				expression.isNullOrEmpty();
-			case FUNCTION(func):
-				func == null;
 		}
 	}
 

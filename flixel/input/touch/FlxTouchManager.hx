@@ -1,8 +1,8 @@
 package flixel.input.touch;
 
 #if FLX_TOUCH
-import flash.Lib;
 import flash.events.TouchEvent;
+import flash.Lib;
 import flash.ui.Multitouch;
 import flash.ui.MultitouchInputMode;
 
@@ -178,11 +178,10 @@ class FlxTouchManager implements IFlxInputManager
 		if (touch != null)
 		{
 			touch.setXY(Std.int(FlashEvent.stageX), Std.int(FlashEvent.stageY));
-			touch.pressure = FlashEvent.pressure;
 		}
 		else
 		{
-			touch = recycle(Std.int(FlashEvent.stageX), Std.int(FlashEvent.stageY), FlashEvent.touchPointID, FlashEvent.pressure);
+			touch = recycle(Std.int(FlashEvent.stageX), Std.int(FlashEvent.stageY), FlashEvent.touchPointID);
 		}
 		touch.input.press();
 	}
@@ -210,7 +209,6 @@ class FlxTouchManager implements IFlxInputManager
 		if (touch != null)
 		{
 			touch.setXY(Std.int(FlashEvent.stageX), Std.int(FlashEvent.stageY));
-			touch.pressure = FlashEvent.pressure;
 		}
 	}
 
@@ -235,15 +233,16 @@ class FlxTouchManager implements IFlxInputManager
 	 * @param	PointID		id of the touch
 	 * @return	A recycled touch object
 	 */
-	function recycle(X:Int, Y:Int, PointID:Int, pressure:Float):FlxTouch
+	function recycle(X:Int, Y:Int, PointID:Int):FlxTouch
 	{
 		if (_inactiveTouches.length > 0)
 		{
 			var touch:FlxTouch = _inactiveTouches.pop();
-			touch.recycle(X, Y, PointID, pressure);
+			touch.recycle(X, Y, PointID);
 			return add(touch);
 		}
-		return add(new FlxTouch(X, Y, PointID, pressure));
+
+		return add(new FlxTouch(X, Y, PointID));
 	}
 
 	/**
