@@ -192,7 +192,6 @@ class FlxUINumericStepper extends FlxUIGroup implements IFlxUIWidget implements 
 			if (Math.isNaN(v)) {
 				return;
 			}
-			trace(value = v);
 		}
 		
 	}

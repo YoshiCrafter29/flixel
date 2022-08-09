@@ -193,6 +193,10 @@ class TransitionFade extends TransitionEffect
 			s.flipX = DirX < 0;
 			s.flipY = DirY < 0;
 		}
+		s.antialiasing = true;
+		var cam:FlxCamera = FlxG.cameras.list[FlxG.cameras.list.length - 1];
+		s.scale.x *= cam.widescreenMultipliers.x;
+		s.scale.y *= cam.widescreenMultipliers.y;
 		return s;
 	}
 
