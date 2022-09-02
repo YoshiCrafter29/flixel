@@ -61,6 +61,21 @@ class FlxCamera extends FlxBasic
 		_filters.push(filter = new ShaderFilter(shader));
 		return filter;
 	}
+	public function removeShader(shader:FlxShader):Bool
+	{
+		if (_filters == null)
+			_filters = [];
+		for(f in _filters) {
+			if (f is ShaderFilter) {
+				var sf = cast(f, ShaderFilter);
+				if (sf.shader == shader) {
+					_filters.remove(f);
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 	/**
 	 * Whenever the camera should be widescreen or not.

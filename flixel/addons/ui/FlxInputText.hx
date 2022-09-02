@@ -1,5 +1,6 @@
 package flixel.addons.ui;
 
+import openfl.desktop.Clipboard;
 import lime.app.Application;
 import flash.errors.Error;
 import flash.events.KeyboardEvent;
@@ -323,13 +324,17 @@ class FlxInputText extends FlxText
 			}
 		}
 		#end
+		if (hasFocus && FlxG.keys.justPressed.V && FlxG.keys.pressed.CONTROL) {
+			var text = Clipboard.generalClipboard.getData(TEXT_FORMAT);
+			if (text != null) onTextInput(text);
+		}
 	}
 
     private function onTextInput(text:String) {
         if (!hasFocus) return;
         var newText = this.text.substr(0, caretIndex) + text + this.text.substr(caretIndex);
-        caretIndex += text.length;
         this.text = newText;
+        caretIndex += text.length;
     }
 
 	/**

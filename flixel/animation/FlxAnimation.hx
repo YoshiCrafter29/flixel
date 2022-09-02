@@ -39,6 +39,10 @@ class FlxAnimation extends FlxBaseAnimation
 	public var delay(default, null):Float = 0;
 
 	/**
+     *
+	 */
+	public var inputIndices:Array<Int> = [];
+	/**
 	 * Whether the current animation has finished.
 	 */
 	public var finished(default, null):Bool = true;
