@@ -562,7 +562,8 @@ class FlxText extends FlxSprite
 
 	function set_text(Text:String):String
 	{
-		if (text != (text = Text)) {
+		if (text != (text = Text))
+		{
 			if (textField != null)
 			{
 				var ot:String = textField.text;
@@ -801,10 +802,12 @@ class FlxText extends FlxSprite
 			// Need to generate a new buffer to store the text graphic
 			height = newHeight;
 			var key:String = FlxG.bitmap.getUniqueKey("text");
-            // if (graphic != null) {
-            //     FlxG.bitmap.
-            // }
-			if (graphic != null) {
+			// if (graphic != null) {
+			//     FlxG.bitmap.
+			// }
+			graphic.bitmap;
+			if (graphic != null)
+			{
 				FlxG.bitmap.remove(graphic);
 			}
 			makeGraphic(Std.int(newWidth), Std.int(newHeight), FlxColor.TRANSPARENT, false, key);

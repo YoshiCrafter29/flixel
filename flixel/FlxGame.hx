@@ -291,9 +291,11 @@ class FlxGame extends Sprite
 		addEventListener(Event.ADDED_TO_STAGE, create);
 	}
 
-	public function addShader(shader:FlxShader) {
+	public function addShader(shader:FlxShader)
+	{
 		_filters.push(new ShaderFilter(shader));
 	}
+
 	/**
 	 * Sets the filter array to be applied to the game.
 	 */
@@ -643,7 +645,8 @@ class FlxGame extends Sprite
 
 		FlxG.signals.preStateCreate.dispatch(_state);
 
-		_state.create();
+		if (!_state.created)
+			_state.create();
 
 		if (_gameJustStarted)
 			gameStart();
@@ -654,7 +657,8 @@ class FlxGame extends Sprite
 
 		FlxG.signals.postStateSwitch.dispatch();
 
-        _state.createPost();
+		if (!_state.created)
+			_state.createPost();
 	}
 
 	function gameStart():Void

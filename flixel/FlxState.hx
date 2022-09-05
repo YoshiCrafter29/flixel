@@ -13,6 +13,11 @@ import flixel.util.FlxSignal.FlxTypedSignal;
 class FlxState extends FlxGroup
 {
 	/**
+	 * Whenever the state already has been created. When create is called, this is set to true to prevent the state from being created twice when switching back to it.
+	 */
+	public var created:Bool = false;
+
+	/**
 	 * Determines whether or not this state is updated even when it is not the active state.
 	 * For example, if you have your game state first, and then you push a menu state on top of it,
 	 * if this is set to `true`, the game state would continue to update in the background.
@@ -79,7 +84,7 @@ class FlxState extends FlxGroup
 
 	@:noCompletion
 	var _subStateClosed:FlxTypedSignal<FlxSubState->Void>;
-    
+
 	/**
 	 * This function is called after the game engine successfully switches states.
 	 * Override this function, NOT the constructor, to initialize or set up your game state.
@@ -88,7 +93,10 @@ class FlxState extends FlxGroup
 	 */
 	public function create():Void {}
 
-    public function createPost():Void {}
+	public function createPost():Void
+	{
+		created = true;
+	}
 
 	override public function draw():Void
 	{
@@ -158,7 +166,7 @@ class FlxState extends FlxGroup
 	{
 		FlxDestroyUtil.destroy(_subStateOpened);
 		FlxDestroyUtil.destroy(_subStateClosed);
-        
+
 		if (subState != null)
 		{
 			subState.destroy();
@@ -226,7 +234,7 @@ class FlxState extends FlxGroup
 	{
 		return FlxG.cameras.bgColor = Value;
 	}
-    
+
 	@:noCompletion
 	function get_subStateOpened():FlxTypedSignal<FlxSubState->Void>
 	{
