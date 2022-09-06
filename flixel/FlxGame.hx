@@ -606,6 +606,8 @@ class FlxGame extends Sprite
 		FlxG.signals.postGameReset.dispatch();
 	}
 
+	public var resetStuffOnSwitch:Bool = true;
+
 	/**
 	 * If there is a state change requested during the update loop,
 	 * this function handles actual destroying the old state and related processes,
@@ -613,29 +615,35 @@ class FlxGame extends Sprite
 	 */
 	function switchState():Void
 	{
-		// Basic reset stuff
-		FlxG.cameras.reset();
-		FlxG.inputs.onStateSwitch();
-		#if FLX_SOUND_SYSTEM
-		FlxG.sound.destroy();
-		#end
+		if (resetStuffOnSwitch)
+		{
+			// Basic reset stuff
+			FlxG.cameras.reset();
+			FlxG.inputs.onStateSwitch();
+			#if FLX_SOUND_SYSTEM
+			FlxG.sound.destroy();
+			#end
 
-		FlxG.signals.preStateSwitch.dispatch();
+			FlxG.signals.preStateSwitch.dispatch();
 
-		#if FLX_RECORD
-		FlxRandom.updateStateSeed();
-		#end
+			#if FLX_RECORD
+			FlxRandom.updateStateSeed();
+			#end
+		}
 
 		// Destroy the old state (if there is an old state)
 		if (_state != null)
 			_state.destroy();
 
-		// we need to clear bitmap cache only after previous state is destroyed, which will reset useCount for FlxGraphic objects
-		FlxG.bitmap.clearCache();
+		if (resetStuffOnSwitch)
+		{
+			// we need to clear bitmap cache only after previous state is destroyed, which will reset useCount for FlxGraphic objects
+			FlxG.bitmap.clearCache();
 
-		// clearing shaders cause people love fucking around
-		_filters = [];
-		filtersEnabled = true;
+			// clearing shaders cause people love fucking around
+			_filters = [];
+			filtersEnabled = true;
+		}
 
 		// Finally assign and create the new state
 		_state = _requestedState;
@@ -643,10 +651,11 @@ class FlxGame extends Sprite
 		if (_gameJustStarted)
 			FlxG.signals.preGameStart.dispatch();
 
-		FlxG.signals.preStateCreate.dispatch(_state);
-
 		if (!_state.created)
+		{
+			FlxG.signals.preStateCreate.dispatch(_state);
 			_state.create();
+		}
 
 		if (_gameJustStarted)
 			gameStart();
@@ -659,6 +668,7 @@ class FlxGame extends Sprite
 
 		if (!_state.created)
 			_state.createPost();
+		resetStuffOnSwitch = true;
 	}
 
 	function gameStart():Void

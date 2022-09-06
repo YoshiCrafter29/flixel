@@ -16,6 +16,7 @@ class FlxState extends FlxGroup
 	 * Whenever the state already has been created. When create is called, this is set to true to prevent the state from being created twice when switching back to it.
 	 */
 	public var created:Bool = false;
+	public var postCreated:Bool = false;
 
 	/**
 	 * Determines whether or not this state is updated even when it is not the active state.
@@ -91,11 +92,13 @@ class FlxState extends FlxGroup
 	 * We do NOT recommend initializing any flixel objects or utilizing flixel features in
 	 * the constructor, unless you want some crazy unpredictable things to happen!
 	 */
-	public function create():Void {}
+	public function create():Void {
+		created = true;
+	}
 
 	public function createPost():Void
 	{
-		created = true;
+		postCreated = true;
 	}
 
 	override public function draw():Void

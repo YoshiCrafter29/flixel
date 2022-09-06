@@ -20,6 +20,7 @@ class CameraFrontEnd
 	 * Do not edit directly, use `add` and `remove` instead.
 	 */
 	public var list(default, null):Array<FlxCamera> = [];
+	public var aboveList(default, null):Array<FlxCamera> = [];
 	
 	/**
 	 * Array listing all cameras marked as default draw targets, `FlxBasics` with no
@@ -62,15 +63,23 @@ class CameraFrontEnd
 	 *                            `FlxBasics` will not render to it unless you add it to their `cameras` list.
 	 * @return	This FlxCamera instance.
 	 */
-	public function add<T:FlxCamera>(NewCamera:T, DefaultDrawTarget:Bool = true):T
+	public function add<T:FlxCamera>(NewCamera:T, DefaultDrawTarget:Bool = true, above:Bool = false):T
 	{
 		FlxG.game.addChildAt(NewCamera.flashSprite, FlxG.game.getChildIndex(FlxG.game._inputContainer));
+		if (above)
+			for(e in aboveList)
+				remove(e, false);
 		
 		list.push(NewCamera);
 		if (DefaultDrawTarget)
 			defaults.push(NewCamera);
 		
 		NewCamera.ID = list.length - 1;
+		
+		if (above)
+			for(e in aboveList)
+				add(e, false, true);
+		
 		cameraAdded.dispatch(NewCamera);
 		return NewCamera;
 	}
