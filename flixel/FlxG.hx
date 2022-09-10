@@ -114,7 +114,20 @@ class FlxG
 	 * By default this just refers to the first entry in the `FlxG.cameras.list`
 	 * array but you can do what you like with it.
 	 */
-	public static var camera:FlxCamera;
+	private static var _camera:FlxCamera;
+	/**
+	 * By default this just refers to the first entry in the `FlxG.cameras.list`
+	 * array but you can do what you like with it.
+	 */
+	public static var camera(get, set):FlxCamera;
+
+	private static function get_camera() {
+		return _camera == null || _camera.flashSprite == null ? FlxG.cameras.list[0] : _camera;
+	}
+
+	private static function set_camera(v:FlxCamera) {
+		return _camera = v;
+	}
 
 	/**
 	 * The HaxeFlixel version, in semantic versioning syntax. Use `Std.string()`

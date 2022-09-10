@@ -226,6 +226,12 @@ class FlxAtlasFrames extends FlxFramesCollection
 	 */
 	public static function fromSparrow(Source:FlxGraphicAsset, Description:String):FlxAtlasFrames
 	{
+		// force on main thread since weird shit going on
+		#if cpp
+		
+		#end
+
+
 		var graphic:FlxGraphic = FlxG.bitmap.add(Source);
 		if (graphic == null)
 			return null;

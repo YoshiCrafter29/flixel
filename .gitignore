@@ -8,3 +8,4 @@ dump
 *.diff
 *.hxproj
 .unittest
+folder-alias.json

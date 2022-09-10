@@ -20,11 +20,10 @@ class CameraFrontEnd
 	 * Do not edit directly, use `add` and `remove` instead.
 	 */
 	public var list(default, null):Array<FlxCamera> = [];
-	public var aboveList(default, null):Array<FlxCamera> = [];
-	
+
 	/**
-	 * Array listing all cameras marked as default draw targets, `FlxBasics` with no
-	 *`cameras` set will render to them.
+		* Array listing all cameras marked as default draw targets, `FlxBasics` with no
+		*`cameras` set will render to them.
 	 */
 	var defaults:Array<FlxCamera> = [];
 
@@ -32,6 +31,12 @@ class CameraFrontEnd
 	 * The current (global, applies to all cameras) bgColor.
 	 */
 	public var bgColor(get, set):FlxColor;
+
+	/** @since 4.2.0 */
+	public var cameraReset(default, null):FlxTypedSignal<FlxCamera->Void> = new FlxTypedSignal<FlxCamera->Void>();
+
+	/** @since 4.2.0 */
+	public var cameraResetPost(default, null):FlxTypedSignal<FlxCamera->Void> = new FlxTypedSignal<FlxCamera->Void>();
 
 	/** @since 4.2.0 */
 	public var cameraAdded(default, null):FlxTypedSignal<FlxCamera->Void> = new FlxTypedSignal<FlxCamera->Void>();
@@ -63,23 +68,15 @@ class CameraFrontEnd
 	 *                            `FlxBasics` will not render to it unless you add it to their `cameras` list.
 	 * @return	This FlxCamera instance.
 	 */
-	public function add<T:FlxCamera>(NewCamera:T, DefaultDrawTarget:Bool = true, above:Bool = false):T
+	public function add<T:FlxCamera>(NewCamera:T, DefaultDrawTarget:Bool = true):T
 	{
 		FlxG.game.addChildAt(NewCamera.flashSprite, FlxG.game.getChildIndex(FlxG.game._inputContainer));
-		if (above)
-			for(e in aboveList)
-				remove(e, false);
-		
+
 		list.push(NewCamera);
 		if (DefaultDrawTarget)
 			defaults.push(NewCamera);
-		
+
 		NewCamera.ID = list.length - 1;
-		
-		if (above)
-			for(e in aboveList)
-				add(e, false, true);
-		
 		cameraAdded.dispatch(NewCamera);
 		return NewCamera;
 	}
@@ -118,7 +115,7 @@ class CameraFrontEnd
 
 		cameraRemoved.dispatch(Camera);
 	}
-	
+
 	/**
 	 * If set to true, the camera is listed as a default draw target, meaning `FlxBasics`
 	 * render to the specified camera if the `FlxBasic` has a null `cameras` value.
@@ -135,9 +132,9 @@ class CameraFrontEnd
 			FlxG.log.warn("FlxG.cameras.setDefaultDrawTarget(): The specified camera is not a part of the game.");
 			return;
 		}
-		
+
 		var index = defaults.indexOf(camera);
-		
+
 		if (value && index == -1)
 			defaults.push(camera);
 		else if (!value)
@@ -152,6 +149,7 @@ class CameraFrontEnd
 	 */
 	public function reset(?NewCamera:FlxCamera):Void
 	{
+		cameraReset.dispatch(NewCamera);
 		while (list.length > 0)
 			remove(list[0]);
 
@@ -162,6 +160,7 @@ class CameraFrontEnd
 		NewCamera.ID = 0;
 
 		FlxCamera._defaultCameras = defaults;
+		cameraResetPost.dispatch(NewCamera);
 	}
 
 	/**

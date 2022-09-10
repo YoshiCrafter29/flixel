@@ -566,9 +566,7 @@ class FlxText extends FlxSprite
 		{
 			if (textField != null)
 			{
-				var ot:String = textField.text;
-				textField.text = Text;
-				_regen = (textField.text != ot) || _regen;
+				_regen = (textField.text != Text) || _regen;
 			}
 		}
 		return Text;
@@ -777,6 +775,9 @@ class FlxText extends FlxSprite
 	{
 		if (textField == null || !_regen)
 			return;
+
+		// TODO: CHANGE TEXT HERE!!!
+		textField.text = text;
 
 		var oldWidth:Int = 0;
 		var oldHeight:Int = VERTICAL_GUTTER;

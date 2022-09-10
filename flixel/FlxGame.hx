@@ -666,7 +666,7 @@ class FlxGame extends Sprite
 
 		FlxG.signals.postStateSwitch.dispatch();
 
-		if (!_state.created)
+		if (!_state.postCreated)
 			_state.createPost();
 		resetStuffOnSwitch = true;
 	}
