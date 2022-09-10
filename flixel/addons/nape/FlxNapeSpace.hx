@@ -1,5 +1,6 @@
 package flixel.addons.nape;
 
+#if nape
 import flash.display.BitmapData;
 import flixel.FlxBasic;
 import flixel.FlxG;
@@ -193,3 +194,4 @@ class FlxNapeSpace extends FlxBasic
 		#end
 	}
 }
+#end

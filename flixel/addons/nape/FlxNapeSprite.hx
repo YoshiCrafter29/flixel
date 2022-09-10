@@ -1,5 +1,6 @@
 package flixel.addons.nape;
 
+#if nape
 import flixel.FlxSprite;
 import flixel.system.FlxAssets;
 import flixel.math.FlxAngle;
@@ -305,3 +306,4 @@ class FlxNapeSprite extends FlxSprite
 		updatePosition();
 	}
 }
+#end

@@ -1,5 +1,6 @@
 package flixel.addons.nape;
 
+#if nape
 import flixel.FlxSprite;
 import flixel.input.touch.FlxTouch;
 import flixel.math.FlxAngle;
@@ -78,3 +79,4 @@ class FlxNapeVelocity
 		Source.body.velocity.set(Vec2.get(0, 0));
 	}
 }
+#end

@@ -1,5 +1,6 @@
 package flixel.addons.nape;
 
+#if nape
 import flixel.addons.nape.FlxNapeSpace;
 import flixel.FlxG;
 import flixel.math.FlxPoint;
@@ -304,3 +305,4 @@ class FlxNapeTilemap extends FlxTilemap
 		return FlxRect.get(StartX - 1, StartY, widthInTiles - 1, EndY);
 	}
 }
+#end
