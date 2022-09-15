@@ -10,7 +10,6 @@ import flixel.math.FlxRect;
 import flixel.system.FlxAssets.FlxGraphicAsset;
 import flixel.system.FlxAssets.FlxTexturePackerSource;
 import openfl.Assets;
-import openfl.display.BitmapData;
 import haxe.Json;
 import haxe.xml.Access;
 
@@ -223,31 +222,24 @@ class FlxAtlasFrames extends FlxFramesCollection
 	 * @param   Description   Contents of the XML file with atlas description.
 	 *                        You can get it with `Assets.getText(path/to/description.xml)`.
 	 *                        Or you can just pass a path to the XML file in the assets directory.
-	 * @param	useCache	  Will specify whenever the cache should be used.
 	 * @return  Newly created `FlxAtlasFrames` collection.
 	 */
-	public static function fromSparrow(Source:FlxGraphicAsset, Description:String, ?useCache:Bool = true):FlxAtlasFrames
+	public static function fromSparrow(Source:FlxGraphicAsset, Description:String):FlxAtlasFrames
 	{
-			
-		var graphic:FlxGraphic = null;
-		var frames:FlxAtlasFrames = null;
-		if (useCache) {
-			graphic = FlxG.bitmap.add(Source);
-			if (graphic == null)
-				return null;
+		// force on main thread since weird shit going on
+		#if cpp
+		
+		#end
 
-			// No need to parse data again
-			frames = FlxAtlasFrames.findFrame(graphic);
-			if (frames != null)
-				return frames;
-		} else {
-			if (Source is FlxGraphic) {
-				graphic = Source;
-			} else if (Source is BitmapData) {
-				@:privateAccess
-				graphic = new FlxGraphic(null, Source, false);
-			}
-		}
+
+		var graphic:FlxGraphic = FlxG.bitmap.add(Source);
+		if (graphic == null)
+			return null;
+
+		// No need to parse data again
+		var frames:FlxAtlasFrames = FlxAtlasFrames.findFrame(graphic);
+		if (frames != null)
+			return frames;
 
 		if (graphic == null || Description == null)
 			return null;

@@ -777,7 +777,7 @@ class FlxText extends FlxSprite
 			return;
 
 		// TODO: CHANGE TEXT HERE!!!
-		textField.text = text == "" ? " " : text;
+		textField.text = text;
 
 		var oldWidth:Int = 0;
 		var oldHeight:Int = VERTICAL_GUTTER;
