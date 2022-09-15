@@ -172,6 +172,7 @@ class BitmapFrontEnd
 	public inline function addGraphic(graphic:FlxGraphic):FlxGraphic
 	{
 		_cache.set(graphic.key, graphic);
+		graphic.mustDestroy = false;
 		return graphic;
 	}
 
@@ -182,7 +183,10 @@ class BitmapFrontEnd
 	 */
 	public inline function get(key:String):FlxGraphic
 	{
-		return _cache.get(key);
+		var graphic = _cache.get(key);
+		if (graphic != null)
+			graphic.mustDestroy = false;
+		return graphic;
 	}
 
 	/**
@@ -336,15 +340,26 @@ class BitmapFrontEnd
 			return;
 		}
 
-		for (key in _cache.keys())
+		for (key=>obj in _cache)
 		{
-			var obj = get(key);
-			if (obj != null && !obj.persist && obj.useCount <= 0)
+			if (!obj.persist && obj.mustDestroy)
 			{
 				removeKey(key);
 				obj.destroy();
 			}
 		}
+	}
+
+	/**
+	 * Maps the entire cache as destroyable, aka must be cleared.
+	 */
+	public function mapCacheAsDestroyable() {
+		if (_cache == null)
+			_cache = new Map();
+
+		for(e in _cache)
+			if (e != null)
+				e.mustDestroy = true;
 	}
 
 	inline function removeKey(key:String):Void
