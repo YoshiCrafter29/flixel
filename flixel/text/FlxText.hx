@@ -221,7 +221,12 @@ class FlxText extends FlxSprite
 		_defaultFormat = null;
 		_formatAdjusted = null;
 		shadowOffset = FlxDestroyUtil.put(shadowOffset);
+
+		if (graphic != null)
+			FlxG.bitmap.remove(graphic);
+		
 		super.destroy();
+		
 	}
 
 	override public function drawFrame(Force:Bool = false):Void
@@ -562,12 +567,12 @@ class FlxText extends FlxSprite
 
 	function set_text(Text:String):String
 	{
-		if (text != (text = Text))
+		text = Text;
+		if (textField != null)
 		{
-			if (textField != null)
-			{
-				_regen = (textField.text != Text) || _regen;
-			}
+			var ot:String = textField.text;
+			textField.text = Text;
+			_regen = (textField.text != ot) || _regen;
 		}
 		return Text;
 	}
@@ -776,9 +781,6 @@ class FlxText extends FlxSprite
 		if (textField == null || !_regen)
 			return;
 
-		// TODO: CHANGE TEXT HERE!!!
-		textField.text = text;
-
 		var oldWidth:Int = 0;
 		var oldHeight:Int = VERTICAL_GUTTER;
 
@@ -803,14 +805,10 @@ class FlxText extends FlxSprite
 			// Need to generate a new buffer to store the text graphic
 			height = newHeight;
 			var key:String = FlxG.bitmap.getUniqueKey("text");
-			// if (graphic != null) {
-			//     FlxG.bitmap.
-			// }
-			graphic.bitmap;
+
 			if (graphic != null)
-			{
 				FlxG.bitmap.remove(graphic);
-			}
+
 			makeGraphic(Std.int(newWidth), Std.int(newHeight), FlxColor.TRANSPARENT, false, key);
 
 			if (_hasBorderAlpha)
