@@ -28,7 +28,7 @@ class FlxGraphic implements IFlxDestroyable
 	 */
 	public static var defaultPersist:Bool = false;
 
-    public var mustDestroy:Bool = false;
+	public var mustDestroy:Bool = false;
 
 	/**
 	 * Creates and caches FlxGraphic object from openfl.Assets key string.

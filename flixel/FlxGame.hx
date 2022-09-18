@@ -598,7 +598,7 @@ class FlxGame extends Sprite
 
 		#if FLX_DEBUG
 		if ((_requestedState is FlxSubState))
-			throw "You can't set FlxSubState class instance as the state for you game";
+			throw "FlxSubState cannot be set as default state.";
 		#end
 
 		FlxG.reset();
