@@ -606,7 +606,8 @@ class FlxGame extends Sprite
 		FlxG.signals.postGameReset.dispatch();
 	}
 
-	public var resetStuffOnSwitch:Bool = true;
+	public var resetStuffOnSwitch:Bool = false;
+	private var __firstSwitch:Bool = true;
 
 	/**
 	 * If there is a state change requested during the update loop,
@@ -615,8 +616,9 @@ class FlxGame extends Sprite
 	 */
 	function switchState():Void
 	{
-		if (resetStuffOnSwitch)
+		if (resetStuffOnSwitch || __firstSwitch)
 		{
+			__firstSwitch = true;
 			// Basic reset stuff
 			FlxG.cameras.reset();
 			FlxG.inputs.onStateSwitch();

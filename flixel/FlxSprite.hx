@@ -131,6 +131,11 @@ class FlxSprite extends FlxObject
 	public var flipY(default, set):Bool = false;
 
 	/**
+	 * Whether offsets should be rotated or not.
+	 */
+	public var rotateOffsets:Bool = false;
+
+	/**
 	 * WARNING: The `origin` of the sprite will default to its center. If you change this,
 	 * the visuals and the collisions will likely be pretty out-of-sync if you do any rotation.
 	 */
@@ -678,7 +683,8 @@ class FlxSprite extends FlxObject
 			if (!camera.visible || !camera.exists || !isOnScreen(camera))
 				continue;
 
-			getScreenPosition(_point, camera).subtractPoint(offset);
+			getScreenPosition(_point, camera);
+			if (!rotateOffsets) _point.subtractPoint(offset);
 
 			if (isSimpleRender(camera))
 				drawSimple(camera);
@@ -706,11 +712,20 @@ class FlxSprite extends FlxObject
 		camera.copyPixels(_frame, framePixels, _flashRect, _flashPoint, colorTransform, blend, antialiasing);
 	}
 
+	var __drawComplexFlipX:Bool = false;
+	var __drawComplexFlipY:Bool = false;
 	@:noCompletion
 	function drawComplex(camera:FlxCamera):Void
 	{
-		_frame.prepareMatrix(_matrix, FlxFrameAngle.ANGLE_0, checkFlipX(), checkFlipY());
-		_matrix.translate(-origin.x, -origin.y);
+		__drawComplexFlipX = checkFlipX();
+		__drawComplexFlipY = checkFlipY();
+		_frame.prepareMatrix(_matrix, FlxFrameAngle.ANGLE_0, __drawComplexFlipX, __drawComplexFlipY);
+		
+		if (rotateOffsets) {
+			_matrix.translate(-offset.x / scale.x, offset.y / scale.y);
+			_matrix.translate(-origin.x / scale.x, -origin.y / scale.y);	
+		} else
+			_matrix.translate(-origin.x, -origin.y);
 		_matrix.scale(scale.x, scale.y);
 
 		if (bakedRotationAngle <= 0)
@@ -721,7 +736,10 @@ class FlxSprite extends FlxObject
 				_matrix.rotateWithTrig(_cosAngle, _sinAngle);
 		}
 
-		_point.add(origin.x, origin.y);
+		if (!rotateOffsets) {
+			_point.add(origin.x, origin.y);
+		} else
+			_point.add(offset.x * scale.y, -offset.y * scale.y);
 		_matrix.translate(_point.x, _point.y);
 
 		if (isPixelPerfectRender(camera))
