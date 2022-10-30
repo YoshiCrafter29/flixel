@@ -80,7 +80,7 @@ class FlxCamera extends FlxBasic
 		}
 		return false;
 	}
-
+	
 	/**
 	 * Whenever the camera should be widescreen or not.
 	 * If null, will use the `FlxG.widescreen` variable.
@@ -784,6 +784,9 @@ class FlxCamera extends FlxBasic
 			drawItem.addQuad(frame, matrix, transform);
 		}
 	}
+
+	public var flipX:Bool = false;
+	public var flipY:Bool = false;
 
 	public function copyPixels(?frame:FlxFrame, ?pixels:BitmapData, ?sourceRect:Rectangle, destPoint:Point, ?transform:ColorTransform, ?blend:BlendMode,
 			?smoothing:Bool = false, ?shader:FlxShader):Void

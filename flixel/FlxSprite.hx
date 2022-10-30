@@ -143,6 +143,16 @@ class FlxSprite extends FlxObject
 	public var offset(default, null):FlxPoint;
 
 	/**
+	 * Whenever it should render the offset as the rotOffset. Defaults to false
+	 */
+	public var useOffsetAsRotOffset:Bool = false;
+
+	/**
+	 * Rotation hitbox
+	 */
+	public var rotOffset(default, null):FlxPoint;
+
+	/**
 	 * Change the size of your sprite's graphic.
 	 * NOTE: The hitbox is not automatically adjusted, use `updateHitbox()` for that (or `setGraphicSize()`).
 	 * WARNING: With `FlxG.renderBlit`, scaling sprites decreases rendering performance by a factor of about x10!
@@ -286,6 +296,7 @@ class FlxSprite extends FlxObject
 		_flashRect2 = new Rectangle();
 		_flashPointZero = new Point();
 		offset = FlxPoint.get();
+		rotOffset = FlxPoint.get();
 		origin = FlxPoint.get();
 		scale = FlxPoint.get(1, 1);
 		_halfSize = FlxPoint.get();
@@ -310,6 +321,7 @@ class FlxSprite extends FlxObject
 		animation = FlxDestroyUtil.destroy(animation);
 
 		offset = FlxDestroyUtil.put(offset);
+		rotOffset = FlxDestroyUtil.put(rotOffset);
 		origin = FlxDestroyUtil.put(origin);
 		scale = FlxDestroyUtil.put(scale);
 		_halfSize = FlxDestroyUtil.put(_halfSize);
@@ -678,7 +690,8 @@ class FlxSprite extends FlxObject
 			if (!camera.visible || !camera.exists || !isOnScreen(camera))
 				continue;
 
-			getScreenPosition(_point, camera).subtractPoint(offset);
+			getScreenPosition(_point, camera);
+			if (!useOffsetAsRotOffset) _point.subtractPoint(offset);
 
 			if (isSimpleRender(camera))
 				drawSimple(camera);
@@ -706,12 +719,25 @@ class FlxSprite extends FlxObject
 		camera.copyPixels(_frame, framePixels, _flashRect, _flashPoint, colorTransform, blend, antialiasing);
 	}
 
+	var _flipX:Bool = false;
+	var _flipY:Bool = false;
+	
 	@:noCompletion
 	function drawComplex(camera:FlxCamera):Void
 	{
-		_frame.prepareMatrix(_matrix, FlxFrameAngle.ANGLE_0, checkFlipX(), checkFlipY());
+		_flipX = checkFlipX();
+		_flipY = checkFlipY();
+
+		_flipX = _flipX != camera.flipX;
+		_flipY = _flipY != camera.flipY;
+
+		_frame.prepareMatrix(_matrix, FlxFrameAngle.ANGLE_0, _flipX, _flipY);
 		_matrix.translate(-origin.x, -origin.y);
 		_matrix.scale(scale.x, scale.y);
+		if (useOffsetAsRotOffset)
+			_matrix.translate(-offset.x, -offset.y);
+		else
+			_matrix.translate(-rotOffset.x, -rotOffset.y);
 
 		if (bakedRotationAngle <= 0)
 		{

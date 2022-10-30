@@ -228,10 +228,10 @@ class FlxAtlasFrames extends FlxFramesCollection
 	 */
 	public static function fromSparrow(Source:FlxGraphicAsset, Description:String, ?useCache:Bool = true):FlxAtlasFrames
 	{
-			
 		var graphic:FlxGraphic = null;
 		var frames:FlxAtlasFrames = null;
-		if (useCache) {
+		if (useCache)
+		{
 			graphic = FlxG.bitmap.add(Source);
 			if (graphic == null)
 				return null;
@@ -240,10 +240,15 @@ class FlxAtlasFrames extends FlxFramesCollection
 			frames = FlxAtlasFrames.findFrame(graphic);
 			if (frames != null)
 				return frames;
-		} else {
-			if (Source is FlxGraphic) {
+		}
+		else
+		{
+			if (Source is FlxGraphic)
+			{
 				graphic = Source;
-			} else if (Source is BitmapData) {
+			}
+			else if (Source is BitmapData)
+			{
 				@:privateAccess
 				graphic = new FlxGraphic(null, Source, false);
 			}
