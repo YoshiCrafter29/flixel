@@ -88,8 +88,9 @@ class FlxGraphicsShader extends GraphicsShader
 		super();
 	}
 
-    public function setCamSize(x:Float, y:Float, width:Float, height:Float) {
-        data._camSize.value = [x, y, width, height];
-    }
+	public function setCamSize(x:Float, y:Float, width:Float, height:Float)
+	{
+		data._camSize.value = [x, y, width, height];
+	}
 }
 #end

@@ -1,7 +1,7 @@
 /*
 	-- YOSHI ENGINE FIXES --
 	Fixed following scrolling speed being different based on FPS.
-	Fixed Shader resizing problem (fix from hazard24)
+	Fixed Shader resizing problem (old fix from hazard24, new fix in)
  */
 
 package flixel;
@@ -80,7 +80,7 @@ class FlxCamera extends FlxBasic
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Whenever the camera should be widescreen or not.
 	 * If null, will use the `FlxG.widescreen` variable.
