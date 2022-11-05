@@ -1096,17 +1096,22 @@ class FlxSprite extends FlxObject
 		
 		if (camera == null)
 			camera = FlxG.camera;
+
+		var offset = useOffsetAsRotOffset ? FlxPoint.get(0, 0) : offset;
+		var rotOffset = useOffsetAsRotOffset ? offset : rotOffset;
 		
 		newRect.setPosition(x, y);
 		if (pixelPerfectPosition)
 			newRect.floor();
-		var scaledOrigin = FlxPoint.weak(origin.x * scale.x, origin.y * scale.y);
+		var scaledOrigin = FlxPoint.weak(origin.x * Math.abs(scale.x), origin.y * Math.abs(scale.y));
+		var scaledRotOffset = FlxPoint.weak(rotOffset.x * Math.abs(scale.x), rotOffset.y * Math.abs(scale.y));
 		newRect.x += -Std.int(camera.scroll.x * scrollFactor.x) - offset.x + origin.x - scaledOrigin.x;
 		newRect.y += -Std.int(camera.scroll.y * scrollFactor.y) - offset.y + origin.y - scaledOrigin.y;
 		if (isPixelPerfectRender(camera))
 			newRect.floor();
 		newRect.setSize(frameWidth * Math.abs(scale.x), frameHeight * Math.abs(scale.y));
-		return newRect.getRotatedBounds(angle, scaledOrigin, newRect);
+		if (useOffsetAsRotOffset) offset.put();
+		return newRect.getRotatedBounds(angle, scaledOrigin, newRect, scaledRotOffset);
 	}
 	
 	/**
