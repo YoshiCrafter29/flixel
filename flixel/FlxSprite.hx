@@ -733,11 +733,11 @@ class FlxSprite extends FlxObject
 
 		_frame.prepareMatrix(_matrix, FlxFrameAngle.ANGLE_0, _flipX, _flipY);
 		_matrix.translate(-origin.x, -origin.y);
-		_matrix.scale(scale.x, scale.y);
 		if (useOffsetAsRotOffset)
 			_matrix.translate(-offset.x, -offset.y);
 		else
 			_matrix.translate(-rotOffset.x, -rotOffset.y);
+		_matrix.scale(scale.x, scale.y);
 
 		if (bakedRotationAngle <= 0)
 		{

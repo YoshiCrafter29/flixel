@@ -15,17 +15,17 @@
 		<assets path="assets/sounds" rename="flixel/sounds" include="*.ogg" unless="flash || air" embed="true" />
 	</section>
 	
-	<assets path="assets/fonts/nokiafc22.ttf" rename="flixel/fonts/nokiafc22.ttf" embed="true" />
-	<assets path="assets/fonts/monsterrat.ttf" rename="flixel/fonts/monsterrat.ttf" embed="true" />
+	<assets path="assets/fonts/nokiafc22.ttf" rename="flixel/fonts/nokiafc22.ttf" embed="false" />
+	<assets path="assets/fonts/monsterrat.ttf" rename="flixel/fonts/monsterrat.ttf" embed="false" />
 	
 	<section unless="unit-test html5">
-		<assets path="assets/images/ui/button.png" rename="flixel/images/ui/button.png" embed="true" />
-		<assets path="assets/images/logo/default.png" rename="flixel/images/logo/default.png" embed="true" />
+		<assets path="assets/images/ui/button.png" rename="flixel/images/ui/button.png" embed="false" />
+		<assets path="assets/images/logo/default.png" rename="flixel/images/logo/default.png" embed="false" />
 	</section>
 
 
-	<assets path="assets-ui/images" rename="flixel/flixel-ui/img" embed="true" />
-	<assets path="assets-ui/xml" rename="flixel/flixel-ui/xml" embed="true" />
+	<assets path="assets-ui/images" rename="flixel/flixel-ui/img" embed="false" />
+	<assets path="assets-ui/xml" rename="flixel/flixel-ui/xml" embed="false" />
 	
 	<set name="legacy" unless="next" />
 	
