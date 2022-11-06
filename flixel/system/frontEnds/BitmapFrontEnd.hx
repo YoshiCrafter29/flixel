@@ -340,10 +340,11 @@ class BitmapFrontEnd
 			return;
 		}
 
-		for (key=>obj in _cache)
+		for (key => obj in _cache)
 		{
-			if (!obj.persist && obj.mustDestroy)
+			if (obj.mustDestroy)
 			{
+				trace(key);
 				removeKey(key);
 				obj.destroy();
 			}
@@ -353,11 +354,12 @@ class BitmapFrontEnd
 	/**
 	 * Maps the entire cache as destroyable, aka must be cleared.
 	 */
-	public function mapCacheAsDestroyable() {
+	public function mapCacheAsDestroyable()
+	{
 		if (_cache == null)
 			_cache = new Map();
 
-		for(e in _cache)
+		for (e in _cache)
 			if (e != null)
 				e.mustDestroy = true;
 	}
