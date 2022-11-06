@@ -344,7 +344,6 @@ class BitmapFrontEnd
 		{
 			if (obj.mustDestroy)
 			{
-				trace(key);
 				removeKey(key);
 				obj.destroy();
 			}
