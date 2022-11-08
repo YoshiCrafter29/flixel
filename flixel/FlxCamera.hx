@@ -107,6 +107,11 @@ class FlxCamera extends FlxBasic
 	public var followActive:Bool = true;
 
 	/**
+	 * Whenever the fix for black bars when the camera rotates should be enabled. Defaults to `true`.
+	 */
+	public var angleFix:Bool = true;
+
+	/**
 	 * While you can alter the zoom of each camera after the fact,
 	 * this variable determines what value the camera will start at when created.
 	 */
@@ -1406,6 +1411,18 @@ class FlxCamera extends FlxBasic
 			_scrollRect.scrollRect = scrlRect;
 			widescreenMultipliers.set(1, 1);
 		}
+
+		if (angleFix) {
+			var flxRect = FlxRect.get();
+
+			flxRect.copyFromFlash(_scrollRect.scrollRect);
+			flxRect.getRotatedBounds(angle, FlxPoint.get(FlxMath.lerp(flxRect.left, flxRect.right, 0.5), FlxMath.lerp(flxRect.top, flxRect.bottom, 0.5)), flxRect);
+			_scrollRect.x += flxRect.x - _scrollRect.scrollRect.x;
+			_scrollRect.y += flxRect.y - _scrollRect.scrollRect.y;
+			_scrollRect.scrollRect = flxRect.copyToFlash();
+
+			flxRect.put();
+		}
 		_scrollRect.x -= w * 0.5;
 		_scrollRect.y -= h * 0.5;
 	}
@@ -2037,6 +2054,8 @@ class FlxCamera extends FlxBasic
 	{
 		angle = Angle;
 		flashSprite.rotation = Angle;
+		if (angleFix)
+			updateScrollRect();
 		return Angle;
 	}
 
