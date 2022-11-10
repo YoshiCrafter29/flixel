@@ -22,6 +22,16 @@ import flash.text.GridFitType;
 class FlxSoundTray extends Sprite
 {
 	/**
+		The sound that'll play when you change volume.
+	**/
+	public static var volumeChangeSFX:String = "flixel/sounds/beep";
+
+	/**
+	 * "VOLUME" text.
+	 */
+	public var text:TextField = new TextField();
+
+	/**
 	 * Because reading any data from DisplayObject is insanely expensive in hxcpp, keep track of whether we need to update it or not.
 	 */
 	public var active:Bool;
@@ -58,7 +68,6 @@ class FlxSoundTray extends Sprite
 		screenCenter();
 		addChild(tmp);
 
-		var text:TextField = new TextField();
 		text.width = tmp.width;
 		text.height = tmp.height;
 		text.multiline = true;
@@ -133,9 +142,7 @@ class FlxSoundTray extends Sprite
 	{
 		if (!Silent)
 		{
-			var sound = FlxAssets.getSound("flixel/sounds/beep");
-			if (sound != null)
-				FlxG.sound.load(sound).play();
+			FlxG.sound.load(volumeChangeSFX).play();
 		}
 
 		_timer = 1;
