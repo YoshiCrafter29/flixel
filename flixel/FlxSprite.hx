@@ -677,21 +677,25 @@ class FlxSprite extends FlxObject
 	{
 		checkEmptyFrame();
 
-		if (alpha == 0 || _frame == null || _frame.type == FlxFrameType.EMPTY || _frame.frame.width == 0 || _frame.frame.height == 0 || graphic.width == 0 || graphic.height == 0 || !graphic.bitmap.readable || graphic.shader == null)
+		if (alpha == 0 || _frame == null || _frame.type == FlxFrameType.EMPTY || _frame.parent.width == 0 || _frame.parent.height == 0
+			|| !_frame.parent.bitmap.readable || graphic.shader == null)
 			return;
 
 		if (dirty) // rarely
 			calcFrame(useFramePixels);
 
-		if (cameras == null) cameras = [];
+		if (cameras == null)
+			cameras = [];
 		for (camera in cameras)
 		{
-			if (camera == null) continue;
+			if (camera == null)
+				continue;
 			if (!camera.visible || !camera.exists || !isOnScreen(camera))
 				continue;
 
 			getScreenPosition(_point, camera);
-			if (!useOffsetAsRotOffset) _point.subtractPoint(offset);
+			if (!useOffsetAsRotOffset)
+				_point.subtractPoint(offset);
 
 			if (isSimpleRender(camera))
 				drawSimple(camera);
@@ -721,7 +725,7 @@ class FlxSprite extends FlxObject
 
 	var _flipX:Bool = false;
 	var _flipY:Bool = false;
-	
+
 	@:noCompletion
 	function drawComplex(camera:FlxCamera):Void
 	{
@@ -1032,7 +1036,7 @@ class FlxSprite extends FlxObject
 	{
 		if (camera == null)
 			camera = FlxG.camera;
-		
+
 		return camera.containsRect(getScreenBounds(_rect, camera));
 	}
 
@@ -1076,11 +1080,11 @@ class FlxSprite extends FlxObject
 	{
 		if (newRect == null)
 			newRect = FlxRect.get();
-		
+
 		newRect.set(x, y, width, height);
 		return newRect.getRotatedBounds(angle, origin, newRect);
 	}
-	
+
 	/**
 	 * Calculates the smallest globally aligned bounding box that encompasses this sprite's graphic as it
 	 * would be displayed. Honors scrollFactor, rotation, scale, offset and origin.
@@ -1093,13 +1097,13 @@ class FlxSprite extends FlxObject
 	{
 		if (newRect == null)
 			newRect = FlxRect.get();
-		
+
 		if (camera == null)
 			camera = FlxG.camera;
 
 		var offset = useOffsetAsRotOffset ? FlxPoint.get(0, 0) : offset;
 		var rotOffset = useOffsetAsRotOffset ? offset : rotOffset;
-		
+
 		newRect.setPosition(x, y);
 		if (pixelPerfectPosition)
 			newRect.floor();
@@ -1110,10 +1114,11 @@ class FlxSprite extends FlxObject
 		if (isPixelPerfectRender(camera))
 			newRect.floor();
 		newRect.setSize(frameWidth * Math.abs(scale.x), frameHeight * Math.abs(scale.y));
-		if (useOffsetAsRotOffset) offset.put();
+		if (useOffsetAsRotOffset)
+			offset.put();
 		return newRect.getRotatedBounds(angle, scaledOrigin, newRect, scaledRotOffset);
 	}
-	
+
 	/**
 	 * Set how a sprite flips when facing in a particular direction.
 	 *
