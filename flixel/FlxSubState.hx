@@ -37,10 +37,6 @@ class FlxSubState extends FlxState
 	@:noCompletion
 	var _bgColor:FlxColor;
 
-	@:noCompletion
-	@:allow(flixel.FlxState.resetSubState)
-	var _created:Bool = false;
-
 	/**
 	 * @param   BGColor   background color for this substate
 	 */

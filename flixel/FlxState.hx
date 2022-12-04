@@ -16,6 +16,7 @@ class FlxState extends FlxGroup
 	 * Whenever the state already has been created. When create is called, this is set to true to prevent the state from being created twice when switching back to it.
 	 */
 	public var created:Bool = false;
+
 	public var postCreated:Bool = false;
 
 	/**
@@ -92,7 +93,8 @@ class FlxState extends FlxGroup
 	 * We do NOT recommend initializing any flixel objects or utilizing flixel features in
 	 * the constructor, unless you want some crazy unpredictable things to happen!
 	 */
-	public function create():Void {
+	public function create():Void
+	{
 		created = true;
 	}
 
@@ -153,15 +155,20 @@ class FlxState extends FlxGroup
 
 			subState._parentState = this;
 
-			if (!subState._created)
+			if (!subState.created)
 			{
-				subState._created = true;
+				subState.created = true;
 				subState.create();
 			}
 			if (subState.openCallback != null)
 				subState.openCallback();
 			if (_subStateOpened != null)
 				_subStateOpened.dispatch(subState);
+			if (!subState.postCreated)
+			{
+				subState.postCreated = true;
+				subState.createPost();
+			}
 		}
 	}
 
