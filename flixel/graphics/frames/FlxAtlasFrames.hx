@@ -264,8 +264,14 @@ class FlxAtlasFrames extends FlxFramesCollection
 
 		var data:Access = new Access(Xml.parse(Description).firstElement());
 
-		for (texture in data.nodes.SubTexture)
+		for (k => texture in data.nodes.SubTexture)
 		{
+			if (!texture.has.name || !texture.has.x || !texture.has.y || !texture.has.width || !texture.has.height)
+			{
+				frames.addAtlasFrame(FlxRect.get(0, 0, -1, -1), FlxPoint.get(-1, -1), FlxPoint.get(0, 0),
+					texture.has.name ? texture.att.name : '<UNKNOWN FRAME ID: $k>');
+				continue;
+			}
 			var name = texture.att.name;
 			var trimmed = texture.has.frameX;
 			var rotated = (texture.has.rotated && texture.att.rotated == "true");
