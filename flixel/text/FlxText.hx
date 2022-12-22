@@ -224,9 +224,8 @@ class FlxText extends FlxSprite
 
 		if (graphic != null)
 			FlxG.bitmap.remove(graphic);
-		
+
 		super.destroy();
-		
 	}
 
 	override public function drawFrame(Force:Bool = false):Void
@@ -790,9 +789,9 @@ class FlxText extends FlxSprite
 			oldHeight = graphic.height;
 		}
 
-		var newWidth:Float = textField.width;
+		var newWidth:Int = Math.ceil(textField.width);
 		// Account for gutter
-		var newHeight:Float = textField.textHeight + VERTICAL_GUTTER;
+		var newHeight:Int = Math.ceil(textField.textHeight) + VERTICAL_GUTTER;
 
 		// prevent text height from shrinking on flash if text == ""
 		if (textField.textHeight == 0)
@@ -809,11 +808,11 @@ class FlxText extends FlxSprite
 			if (graphic != null)
 				FlxG.bitmap.remove(graphic);
 
-			makeGraphic(Std.int(newWidth), Std.int(newHeight), FlxColor.TRANSPARENT, false, key);
+			makeGraphic(newWidth, newHeight, FlxColor.TRANSPARENT, false, key);
 
 			if (_hasBorderAlpha)
 				_borderPixels = graphic.bitmap.clone();
-			frameHeight = Std.int(height);
+			frameHeight = newHeight;
 			textField.height = height * 1.2;
 			_flashRect.x = 0;
 			_flashRect.y = 0;

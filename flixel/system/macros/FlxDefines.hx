@@ -23,6 +23,11 @@ private enum UserDefines
 	FLX_UNIT_TEST;
 	/* additional rendering define */
 	FLX_RENDER_TRIANGLE;
+	/* Uses flixel 4.0 legacy collision */
+	FLX_4_LEGACY_COLLISION;
+	/* Simplifies FlxPoint but can increase GC frequency */
+	FLX_NO_POINT_POOL;
+	FLX_NO_PITCH;
 }
 
 /**
@@ -50,6 +55,8 @@ private enum HelperDefines
 	FLX_GAMEINPUT_API;
 	FLX_ACCELEROMETER;
 	FLX_DRAW_QUADS;
+	FLX_POINT_POOL;
+	FLX_PITCH;
 }
 
 class FlxDefines
@@ -136,6 +143,14 @@ class FlxDefines
 
 		if (!defined(FLX_NO_SOUND_SYSTEM) && !defined(FLX_NO_SOUND_TRAY))
 			define(FLX_SOUND_TRAY);
+		#if (openfl_legacy || lime >= "8.0.0")
+		if (defined(FLX_NO_SOUND_SYSTEM) || #if openfl_legacy !defined("sys") #else defined("flash") #end)
+			define(FLX_NO_PITCH);
+		#else
+		define(FLX_NO_PITCH);
+		#end
+		if (!defined(FLX_NO_PITCH))
+			define(FLX_PITCH);
 
 		if ((!defined("openfl_legacy") && !defined("flash")) || defined("flash11_8"))
 			define(FLX_GAMEINPUT_API);

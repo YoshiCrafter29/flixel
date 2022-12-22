@@ -378,6 +378,8 @@ class FlxPoint implements IFlxPooled
 	 *
 	 * @param   point   The other point.
 	 * @return  The angle in degrees, between -180 and 180.
+	 * 
+	 * @see [Flixel 5.0.0 Migration guide](https://github.com/HaxeFlixel/flixel/wiki/Flixel-5.0.0-Migration-guide)
 	 */
 	public function angleBetween(point:FlxPoint):Float
 	{

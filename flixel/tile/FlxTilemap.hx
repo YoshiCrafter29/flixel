@@ -35,42 +35,69 @@ import Std.is as isOfType;
 using flixel.util.FlxColorTransformUtil;
 
 #if html5
+/**
+ * BitmapData loaded via @:bitmap is loaded asynchronously, this allows us to apply frame
+ * padding to the bitmap once it's loaded rather
+ */
+private interface IEmbeddedBitmapData
+{
+	var onLoad:() -> Void;
+}
+
 @:keep @:bitmap("assets/images/tile/autotiles.png")
 private class RawGraphicAuto extends BitmapData {}
-class GraphicAuto extends RawGraphicAuto
+
+class GraphicAuto extends RawGraphicAuto implements IEmbeddedBitmapData
 {
-	public function new (width = 128, height = 8, transparent = true, fillRGBA = 0xFFffffff, ?onLoad:Dynamic)
+	static inline var WIDTH = 128;
+	static inline var HEIGHT = 8;
+
+	public var onLoad:() -> Void;
+
+	public function new()
 	{
-		super(width, height, transparent, fillRGBA, onLoad);
+		super(WIDTH, HEIGHT, true, 0xFFffffff, (_) -> if (onLoad != null) onLoad());
 		// Set properties because `@:bitmap` constructors ignore width/height
-		this.width = width;
-		this.height = height;
+		this.width = WIDTH;
+		this.height = HEIGHT;
 	}
 }
 
 @:keep @:bitmap("assets/images/tile/autotiles_alt.png")
 private class RawGraphicAutoAlt extends BitmapData {}
-class GraphicAutoAlt extends RawGraphicAutoAlt
+
+class GraphicAutoAlt extends RawGraphicAutoAlt implements IEmbeddedBitmapData
 {
-	public function new (width = 128, height = 8, transparent = true, fillRGBA = 0xFFffffff, ?onLoad:Dynamic)
+	static inline var WIDTH = 128;
+	static inline var HEIGHT = 8;
+
+	public var onLoad:() -> Void;
+
+	public function new()
 	{
-		super(width, height, transparent, fillRGBA, onLoad);
-		// Set again because `@:bitmap` constructors ignore width/height
-		this.width = width;
-		this.height = height;
+		super(WIDTH, HEIGHT, true, 0xFFffffff, (_) -> if (onLoad != null) onLoad());
+		// Set properties because `@:bitmap` constructors ignore width/height
+		this.width = WIDTH;
+		this.height = HEIGHT;
 	}
 }
 
 @:keep @:bitmap("assets/images/tile/autotiles_full.png")
 private class RawGraphicAutoFull extends BitmapData {}
-class GraphicAutoFull extends RawGraphicAutoFull
+
+class GraphicAutoFull extends RawGraphicAutoFull implements IEmbeddedBitmapData
 {
-	public function new (width = 256, height = 48, transparent = true, fillRGBA = 0xFFffffff, ?onLoad:Dynamic)
+	static inline var WIDTH = 256;
+	static inline var HEIGHT = 48;
+
+	public var onLoad:() -> Void;
+
+	public function new()
 	{
-		super(width, height, transparent, fillRGBA, onLoad);
-		// Set again because `@:bitmap` constructors ignore width/height
-		this.width = width;
-		this.height = height;
+		super(WIDTH, HEIGHT, true, 0xFFffffff, (_) -> if (onLoad != null) onLoad());
+		// Set properties because `@:bitmap` constructors ignore width/height
+		this.width = WIDTH;
+		this.height = HEIGHT;
 	}
 }
 #else
@@ -110,8 +137,10 @@ class FlxTilemap extends FlxBaseTilemap<FlxTile>
 	/**
 	 * Controls whether the object is smoothed when rotated, affects performance.
 	 * @since 4.1.0
+	 * 
+	 * @see FlxSprite.defaultAntialiasing
 	 */
-	public var antialiasing(default, set):Bool = false;
+	public var antialiasing(default, set):Bool = FlxSprite.defaultAntialiasing;
 
 	/**
 	 * Use to offset the drawing position of the tilemap,
@@ -329,7 +358,38 @@ class FlxTilemap extends FlxBaseTilemap<FlxTile>
 		if (_tileHeight <= 0)
 			_tileHeight = _tileWidth;
 
-		frames = FlxTileFrames.fromGraphic(graph, FlxPoint.get(_tileWidth, _tileHeight));
+		this.tileWidth = tileWidth;
+		this.tileHeight = tileHeight;
+
+		if (defaultFramePadding > 0 && graph.isLoaded)
+			frames = padTileFrames(tileWidth, tileHeight, graph, defaultFramePadding);
+		else
+		{
+			#if html5
+			/* if Using tile graphics like GraphicAuto or others defined above, they will not
+			 * load immediately. Track their loading and apply frame padding after.
+			**/
+			if (!graph.isLoaded && isOfType(graph.bitmap, IEmbeddedBitmapData))
+			{
+				var futureBitmap:IEmbeddedBitmapData = cast graph.bitmap;
+				futureBitmap.onLoad = function()
+				{
+					frames = padTileFrames(tileWidth, tileHeight, graph, defaultFramePadding);
+				}
+			}
+			else if (defaultFramePadding > 0 && !graph.isLoaded)
+			{
+				FlxG.log.warn('defaultFramePadding not applied to "${graph.key}" because it is loading asynchronously.'
+					+ "using `@:bitmap` assets on html5 is not recommended");
+			}
+			#end
+			frames = FlxTileFrames.fromGraphic(graph, FlxPoint.get(tileWidth, tileHeight));
+		}
+	}
+
+	function padTileFrames(tileWidth:Int, tileHeight:Int, graphic:FlxGraphic, padding:Int)
+	{
+		return FlxTileFrames.fromBitmapAddSpacesAndBorders(graphic, FlxPoint.get(tileWidth, tileHeight), null, FlxPoint.get(padding, padding));
 	}
 
 	override function initTileObjects():Void
@@ -804,9 +864,170 @@ class FlxTilemap extends FlxBaseTilemap<FlxTile>
 		if (_scaledTileHeight < _scaledTileWidth)
 			step = _scaledTileHeight;
 
-		step /= Resolution;
-		var deltaX:Float = End.x - Start.x;
-		var deltaY:Float = End.y - Start.y;
+		if (trimmedStart == null || trimmedEnd == null)
+		{
+			FlxDestroyUtil.put(trimmedStart);
+			FlxDestroyUtil.put(trimmedEnd);
+			return true;
+		}
+
+		start = trimmedStart;
+		end = trimmedEnd;
+
+		inline function clearRefs()
+		{
+			trimmedStart.put();
+			trimmedEnd.put();
+		}
+
+		final startIndex = getTileIndexByCoords(start);
+		final endIndex = getTileIndexByCoords(end);
+
+		// If the starting tile is solid, return the starting position
+		if (getTileCollisions(getTileByIndex(startIndex)) != NONE)
+		{
+			if (result != null)
+				result.copyFrom(start);
+
+			clearRefs();
+			return false;
+		}
+
+		final startTileX = startIndex % widthInTiles;
+		final startTileY = Std.int(startIndex / widthInTiles);
+		final endTileX = endIndex % widthInTiles;
+		final endTileY = Std.int(endIndex / widthInTiles);
+		var hitIndex = -1;
+
+		if (start.x == end.x)
+		{
+			hitIndex = checkColumn(startTileX, startTileY, endTileY);
+			if (hitIndex != -1 && result != null)
+			{
+				// check the bottom
+				result.copyFrom(getTileCoordsByIndex(hitIndex, false));
+				result.x = start.x;
+				if (start.y > end.y)
+					result.y += scaledTileHeight;
+			}
+		}
+		else
+		{
+			// Use y = mx + b formula
+			final m = (start.y - end.y) / (start.x - end.x);
+			// y - mx = b
+			final b = start.y - m * start.x;
+
+			final movesRight = start.x < end.x;
+			final inc = movesRight ? 1 : -1;
+			final offset = movesRight ? 1 : 0;
+			var tileX = startTileX;
+			var tileY = 0;
+			var xPos = 0.0;
+			var yPos = 0.0;
+			var lastTileY = startTileY;
+
+			while (tileX != endTileX)
+			{
+				xPos = x + (tileX + offset) * scaledTileWidth;
+				yPos = m * xPos + b;
+				tileY = Math.floor((yPos - y) / scaledTileHeight);
+				hitIndex = checkColumn(tileX, lastTileY, tileY);
+				if (hitIndex != -1)
+					break;
+				lastTileY = tileY;
+				tileX += inc;
+			}
+
+			if (hitIndex == -1)
+				hitIndex = checkColumn(endTileX, lastTileY, endTileY);
+
+			if (hitIndex != -1 && result != null)
+			{
+				result.copyFrom(getTileCoordsByIndex(hitIndex, false));
+				if (Std.int(hitIndex / widthInTiles) == lastTileY)
+				{
+					if (start.x > end.x)
+						result.x += scaledTileWidth;
+
+					// set result to left side
+					result.y = m * result.x + b; // mx + b
+				}
+				else
+				{
+					// if ascending
+					if (start.y > end.y)
+					{
+						// change result to bottom
+						result.y += scaledTileHeight;
+					}
+					// otherwise result is top
+
+					// x = (y - b)/m
+					result.x = (result.y - b) / m;
+				}
+			}
+		}
+
+		clearRefs();
+		return hitIndex == -1;
+	}
+
+	function checkColumn(x:Int, startY:Int, endY:Int):Int
+	{
+		if (startY < 0)
+			startY = 0;
+
+		if (endY < 0)
+			endY = 0;
+
+		if (startY > heightInTiles - 1)
+			startY = heightInTiles - 1;
+
+		if (endY > heightInTiles - 1)
+			endY = heightInTiles - 1;
+
+		var y = startY;
+		final step = startY <= endY ? 1 : -1;
+		while (true)
+		{
+			var index = y * widthInTiles + x;
+			if (getTileCollisions(getTileByIndex(index)) != NONE)
+				return index;
+
+			if (y == endY)
+				break;
+
+			y += step;
+		}
+
+		return -1;
+	}
+
+	/**
+	 * Shoots a ray from the start point to the end point.
+	 * If/when it passes through a tile, it stores that point and returns false.
+	 * This method checks at steps and can miss, for better results use `ray()`
+	 * @since 5.0.0
+	 *
+	 * @param   start       The world coordinates of the start of the ray.
+	 * @param   end         The world coordinates of the end of the ray.
+	 * @param   result      Optional result vector, to avoid creating a new instance to be returned.
+	 * @param   resolution  Defaults to 1, meaning check every tile or so.  Higher means more checks!
+	 *                      Only returned if the line enters the rect.
+	 * @return  Returns true if the ray made it from Start to End without hitting anything.
+	 *          Returns false and fills Result if a tile was hit.
+	 */
+	override function rayStep(start:FlxPoint, end:FlxPoint, ?result:FlxPoint, resolution:Float = 1):Bool
+	{
+		var step:Float = scaledTileWidth;
+
+		if (scaledTileHeight < scaledTileWidth)
+			step = scaledTileHeight;
+
+		step /= resolution;
+		var deltaX:Float = end.x - start.x;
+		var deltaY:Float = end.y - start.y;
 		var distance:Float = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
 		var steps:Int = Math.ceil(distance / step);
 		var stepX:Float = deltaX / steps;

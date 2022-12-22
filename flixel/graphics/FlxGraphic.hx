@@ -23,8 +23,8 @@ import openfl.display.Tilesheet;
 class FlxGraphic implements IFlxDestroyable
 {
 	/**
-	 * The default value for the `persist` variable
-	 * at creation if none is specified in the constructor.
+	 * The default value for the `persist` variable at creation if none is specified in the constructor.
+	 * @see [FlxGraphic.persist](https://api.haxeflixel.com/flixel/graphics/FlxGraphic.html#persist)
 	 */
 	public static var defaultPersist:Bool = false;
 
@@ -315,6 +315,11 @@ class FlxGraphic implements IFlxDestroyable
 	public var isDumped(default, null):Bool = false;
 
 	/**
+	 * Whether the `BitmapData` of this graphic object has been loaded or not.
+	 */
+	public var isLoaded(get, never):Bool;
+
+	/**
 	 * Whether the `BitmapData` of this graphic object can be dumped for decreased memory usage,
 	 * but may cause some issues (when you need direct access to pixels of this graphic.
 	 * If the graphic is dumped then you should call `undump()` and have total access to pixels.
@@ -581,6 +586,11 @@ class FlxGraphic implements IFlxDestroyable
 			return FlxGraphic.getBitmap(newBitmap, unique);
 
 		return null;
+	}
+	
+	inline function get_isLoaded()
+	{
+		return bitmap != null && !bitmap.rect.isEmpty();
 	}
 
 	inline function get_canBeDumped():Bool

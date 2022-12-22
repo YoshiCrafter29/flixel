@@ -115,17 +115,20 @@ class FlxG
 	 * array but you can do what you like with it.
 	 */
 	private static var _camera:FlxCamera;
+
 	/**
 	 * By default this just refers to the first entry in the `FlxG.cameras.list`
 	 * array but you can do what you like with it.
 	 */
 	public static var camera(get, set):FlxCamera;
 
-	private static function get_camera() {
+	private static function get_camera()
+	{
 		return _camera == null || _camera.flashSprite == null ? FlxG.cameras.list[0] : _camera;
 	}
 
-	private static function set_camera(v:FlxCamera) {
+	private static function set_camera(v:FlxCamera)
+	{
 		return _camera = v;
 	}
 
@@ -133,7 +136,7 @@ class FlxG
 	 * The HaxeFlixel version, in semantic versioning syntax. Use `Std.string()`
 	 * on it to get a `String` formatted like this: `"HaxeFlixel MAJOR.MINOR.PATCH-COMMIT_SHA"`.
 	 */
-	public static var VERSION(default, null):FlxVersion = new FlxVersion(4, 11, 0);
+	public static var VERSION(default, null):FlxVersion = new FlxVersion(5, 0, 2);
 
 	/**
 	 * Internal tracker for game object.
