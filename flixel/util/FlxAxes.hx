@@ -26,14 +26,17 @@ enum abstract FlxAxes(Int)
 	{
 		return cast this;
 	}
+
 	inline function get_x()
 	{
 		return self == X || self == XY;
 	}
+
 	inline function get_y()
 	{
 		return self == Y || self == XY;
 	}
+
 	public function toString():String
 	{
 		return switch self
@@ -44,10 +47,12 @@ enum abstract FlxAxes(Int)
 			case NONE: "none";
 		}
 	}
+
 	public static function fromBools(x:Bool, y:Bool):FlxAxes
 	{
 		return cast(x ? (cast X : Int) : 0) | (y ? (cast Y : Int) : 0);
 	}
+
 	public static function fromString(axes:String):FlxAxes
 	{
 		return switch axes.toLowerCase()
