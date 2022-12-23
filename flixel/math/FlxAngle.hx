@@ -88,7 +88,10 @@ class FlxAngle
 	 */
 	public static inline function angleFromOrigin(x:Float, y:Float, asDegrees:Bool = false)
 	{
-		return if (asDegrees) Math.atan2(y, x) * TO_DEG; else Math.atan2(y, x);
+		return if (asDegrees)
+				Math.atan2(y, x) * TO_DEG;
+			else
+				Math.atan2(y, x);
 	}
 
 	/**

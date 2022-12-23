@@ -39,11 +39,9 @@ import flixel.math.FlxAngle;
 	 * @since 5.0.0
 	 */
 	public var degrees(get, never):Float;
-
 	function get_degrees():Float
 	{
-		return switch (this)
-		{
+		return switch (this) {
 			case RIGHT: 0;
 			case DOWN: 90;
 			case UP: -90;
@@ -62,18 +60,25 @@ import flixel.math.FlxAngle;
 	 * @since 5.0.0
 	 */
 	public var radians(get, never):Float;
-
 	inline function get_radians():Float
 	{
 		return degrees * FlxAngle.TO_RAD;
 	}
 
 	/**
-	 * Returns true if this contains all of the supplied flags.
+	 * Returns true if this contains **all** of the supplied flags.
 	 */
 	public inline function has(dir:FlxDirectionFlags):Bool
 	{
 		return this & dir == dir;
+	}
+
+	/**
+	 * Returns true if this contains **any** of the supplied flags.
+	 */
+	public inline function hasAny(dir:FlxDirectionFlags):Bool
+	{
+		return this & dir > 0;
 	}
 
 	/**
@@ -117,7 +122,10 @@ import flixel.math.FlxAngle;
 	 */
 	public static function fromBools(left:Bool, right:Bool, up:Bool, down:Bool):FlxDirectionFlags
 	{
-		return (left ? LEFT : NONE) | (right ? RIGHT : NONE) | (up ? UP : NONE) | (down ? DOWN : NONE);
+		return (left  ? LEFT  : NONE)
+			|  (right ? RIGHT : NONE)
+			|  (up    ? UP    : NONE)
+			|  (down  ? DOWN  : NONE);
 	}
 
 	// Expose int operators

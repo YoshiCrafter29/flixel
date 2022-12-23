@@ -83,6 +83,61 @@ class FlxArrayUtil
 	}
 
 	/**
+	 * Swaps two elements of an array, which are located at indices `index1` and `index2`
+	 * @param array The array whose elements need to be swapped
+	 * @param index1 The index of one of the elements to be swapped
+	 * @param index2 The index of the other element to be swapped
+	 * @return The array
+	 */
+	public static inline function swapByIndex<T>(array:Array<T>, index1:Int, index2:Int):Array<T>
+	{
+		var temp = array[index1];
+		array[index1] = array[index2];
+		array[index2] = temp;
+		return array;
+	}
+
+	/**
+	 * Swaps two elements of an array, which are located at indices `index1` and `index2` and also checks if the indices are valid before swapping
+	 * @param array The array whose elements need to be swapped
+	 * @param index1 The index of one of the elements to be swapped
+	 * @param index2 The index of the other element to be swapped
+	 * @return The array
+	 */
+	public static inline function safeSwapByIndex<T>(array:Array<T>, index1:Int, index2:Int):Array<T>
+	{
+		if(index1 >= 0 && index1 < array.length && index2 >= 0 && index2 < array.length)
+		{
+			swapByIndex(array, index1, index2);
+		}
+		return array;
+	}
+
+	/**
+	 * Swaps two items, `item1` and `item2` which are in the array
+	 * @param array The array whose elements need to be swapped
+	 * @param item1 One of the elements of the array which needs to be swapped
+	 * @param item2 The other element of the array which needs to be swapped
+	 * @return The array
+	 */
+	public static inline function swap<T>(array:Array<T>, item1:T, item2:T):Array<T>
+	{
+		return swapByIndex(array, array.indexOf(item1), array.indexOf(item2));
+	}
+
+	/**
+	 * Swaps two items, `item1` and `item2` which are in the array, but only if both elements are present in the array
+	 * @param array The array whose elements need to be swapped
+	 * @param item1 One of the elements of the array which needs to be swapped
+	 * @param item2 The other element of the array which needs to be swapped
+	 * @return The array
+	 */
+	public static inline function safeSwap<T>(array:Array<T>, item1:T, item2:T):Array<T>
+	{
+		return safeSwapByIndex(array, array.indexOf(item1), array.indexOf(item2));
+	}
+
+	/**
 	 * Clears an array structure, but leaves the object data untouched
 	 * Useful for cleaning up temporary references to data you want to preserve.
 	 * WARNING: Can lead to memory leaks.
@@ -163,10 +218,11 @@ class FlxArrayUtil
 	 * Pushes the element into the array (and if the array is null, creates it first) and returns the array.
 	 * @since 4.6.0
 	 */
-	public static function safePush<T>(array:Array<T>, element:T):Array<T>
+	public static function safePush<T>(array:Null<Array<T>>, element:T):Array<T>
 	{
 		if (array == null)
 			array = [];
+		
 		array.push(element);
 		return array;
 	}
@@ -174,5 +230,14 @@ class FlxArrayUtil
 	public static inline function contains<T>(array:Array<T>, element:T):Bool
 	{
 		return array.indexOf(element) != -1;
+	}
+
+	/**
+	 * Returns true if the array is not null and contains the element.
+	 * @since 5.0.0
+	 */
+	public static inline function safeContains<T>(array:Null<Array<T>>, element:T):Bool
+	{
+		return array != null && contains(array, element);
 	}
 }
