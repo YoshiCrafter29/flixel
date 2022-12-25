@@ -757,13 +757,13 @@ class FlxSprite extends FlxObject
 
 		if (rotOffsetAngle != null && rotOffsetAngle != angle)
 		{
-			var angleOff = (-angle + rotOffsetAngle + 90) * FlxAngle.TO_RAD;
-			_matrix.rotate(angleOff);
+			var angleOff = (-angle + rotOffsetAngle) * FlxAngle.TO_RAD;
+			_matrix.rotate(-angleOff);
 			if (useOffsetAsRotOffset)
 				_matrix.translate(-offset.x, -offset.y);
 			else
 				_matrix.translate(-rotOffset.x, -rotOffset.y);
-			_matrix.rotate(-angleOff);
+			_matrix.rotate(angleOff);
 		}
 		else
 		{
