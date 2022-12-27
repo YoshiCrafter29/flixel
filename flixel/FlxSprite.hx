@@ -684,6 +684,8 @@ class FlxSprite extends FlxObject
 			loadGraphic("flixel/images/logo/default.png");
 	}
 
+	var __firstDraw = true;
+
 	/**
 	 * Called by game loop, updates then blits or renders current frame of animation to the screen.
 	 */
@@ -707,7 +709,7 @@ class FlxSprite extends FlxObject
 		{
 			if (camera == null)
 				continue;
-			if (!camera.visible || !camera.exists || !isOnScreen(camera))
+			if (!camera.visible || !camera.exists || (!__firstDraw && !isOnScreen(camera)))
 				continue;
 
 			getScreenPosition(_point, camera);
@@ -728,6 +730,8 @@ class FlxSprite extends FlxObject
 		if (FlxG.debugger.drawDebug)
 			drawDebug();
 		#end
+
+		__firstDraw = false;
 	}
 
 	@:noCompletion

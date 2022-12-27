@@ -164,7 +164,7 @@ class FlxTrail extends FlxSpriteGroup
 				spritePosition = FlxPoint.get();
 			}
 
-			spritePosition.set(target.x - target.offset.x, target.y - target.offset.y);
+			spritePosition.set(target.x - target.offset.x - target.rotOffset.x, target.y - target.offset.y - target.rotOffset.y);
 			_recentPositions.unshift(spritePosition);
 
 			// Also do the same thing for the Sprites angle if rotationsEnabled
