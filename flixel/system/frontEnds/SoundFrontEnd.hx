@@ -83,6 +83,11 @@ class SoundFrontEnd
 	public var volume(default, set):Float = 1;
 
 	/**
+	 * Whenever switching volume is enabled or not.
+	 */
+	public var enableVolumeChanges:Bool = true;
+
+	/**
 	 * Set up and play a looping background soundtrack.
 	 *
 	 * @param	Music		The sound file you want to loop in the background.
@@ -217,8 +222,8 @@ class SoundFrontEnd
 	 * @param	OnComplete		Called when the sound finished playing
 	 * @return	A FlxSound object.
 	 */
-	public function play(EmbeddedSound:FlxSoundAsset, Volume:Float = 1, Looped:Bool = false, ?Group:FlxSoundGroup,
-			AutoDestroy:Bool = true, ?OnComplete:Void->Void):FlxSound
+	public function play(EmbeddedSound:FlxSoundAsset, Volume:Float = 1, Looped:Bool = false, ?Group:FlxSoundGroup, AutoDestroy:Bool = true,
+			?OnComplete:Void->Void):FlxSound
 	{
 		if ((EmbeddedSound is String))
 		{
@@ -242,8 +247,8 @@ class SoundFrontEnd
 	 * @param	OnLoad			Called when the sound finished loading.
 	 * @return	A FlxSound object.
 	 */
-	public function stream(URL:String, Volume:Float = 1, Looped:Bool = false, ?Group:FlxSoundGroup,
-			AutoDestroy:Bool = true, ?OnComplete:Void->Void, ?OnLoad:Void->Void):FlxSound
+	public function stream(URL:String, Volume:Float = 1, Looped:Bool = false, ?Group:FlxSoundGroup, AutoDestroy:Bool = true, ?OnComplete:Void->Void,
+			?OnLoad:Void->Void):FlxSound
 	{
 		return load(null, Volume, Looped, Group, AutoDestroy, true, URL, OnComplete, OnLoad);
 	}
@@ -371,12 +376,15 @@ class SoundFrontEnd
 			list.update(elapsed);
 
 		#if FLX_KEYBOARD
-		if (FlxG.keys.anyJustReleased(muteKeys))
-			toggleMuted();
-		else if (FlxG.keys.anyJustReleased(volumeUpKeys))
-			changeVolume(0.1);
-		else if (FlxG.keys.anyJustReleased(volumeDownKeys))
-			changeVolume(-0.1);
+		if (enableVolumeChanges)
+		{
+			if (FlxG.keys.anyJustReleased(muteKeys))
+				toggleMuted();
+			else if (FlxG.keys.anyJustReleased(volumeUpKeys))
+				changeVolume(0.1);
+			else if (FlxG.keys.anyJustReleased(volumeDownKeys))
+				changeVolume(-0.1);
+		}
 		#end
 	}
 
