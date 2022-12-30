@@ -677,7 +677,7 @@ class FlxTween implements IFlxDestroyable
 	{
 		return false;
 	}
-	
+
 	/**
 	 * Set both type of delays for this tween.
 	 *
@@ -824,6 +824,8 @@ class FlxTweenManager extends FlxBasic
 	 */
 	public function tween(Object:Dynamic, Values:Dynamic, Duration:Float = 1, ?Options:TweenOptions):VarTween
 	{
+		if (Object == null)
+			throw 'Cannot tween an object that is equal to null.';
 		var tween = new VarTween(Options, this);
 		tween.tween(Object, Values, Duration);
 		return add(tween);
@@ -1190,7 +1192,7 @@ class FlxTweenManager extends FlxBasic
 	 */
 	public function cancelTweensOf(Object:Dynamic, ?FieldPaths:Array<String>):Void
 	{
-		forEachTweensOf(Object, FieldPaths, function (tween) tween.cancel());
+		forEachTweensOf(Object, FieldPaths, function(tween) tween.cancel());
 	}
 
 	/**
@@ -1216,13 +1218,11 @@ class FlxTweenManager extends FlxBasic
 	 */
 	public function completeTweensOf(Object:Dynamic, ?FieldPaths:Array<String>):Void
 	{
-		forEachTweensOf(Object, FieldPaths,
-			function (tween)
-			{
-				if ((tween.type & FlxTweenType.LOOPING) == 0 && (tween.type & FlxTweenType.PINGPONG) == 0 && tween.active)
-					tween.update(FlxMath.MAX_VALUE_FLOAT);
-			}
-		);
+		forEachTweensOf(Object, FieldPaths, function(tween)
+		{
+			if ((tween.type & FlxTweenType.LOOPING) == 0 && (tween.type & FlxTweenType.PINGPONG) == 0 && tween.active)
+				tween.update(FlxMath.MAX_VALUE_FLOAT);
+		});
 	}
 
 	/**
@@ -1241,7 +1241,7 @@ class FlxTweenManager extends FlxBasic
 	{
 		if (Object == null)
 			throw "Cannot cancel tween variables of an object that is null.";
-		
+
 		if (FieldPaths == null || FieldPaths.length == 0)
 		{
 			var i = _tweens.length;
@@ -1267,11 +1267,11 @@ class FlxTweenManager extends FlxBasic
 					if (!Reflect.isObject(target))
 						break;
 				}
-				
+
 				if (Reflect.isObject(target))
-					propertyInfos.push({ object:target, field:field });
+					propertyInfos.push({object: target, field: field});
 			}
-			
+
 			var i = _tweens.length;
 			while (i-- > 0)
 			{
@@ -1283,7 +1283,7 @@ class FlxTweenManager extends FlxBasic
 						Function(tween);
 						break;
 					}
-				} 
+				}
 			}
 		}
 	}
