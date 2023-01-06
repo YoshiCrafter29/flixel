@@ -226,7 +226,7 @@ class FlxInputText extends FlxText
 
 		lines = 1;
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
-        Application.current.window.onTextInput.add(onTextInput);
+		Application.current.window.onTextInput.add(onTextInput);
 
 		if (Text == null)
 		{
@@ -244,7 +244,7 @@ class FlxInputText extends FlxText
 	override public function destroy():Void
 	{
 		FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
-        Application.current.window.onTextInput.remove(onTextInput);
+		Application.current.window.onTextInput.remove(onTextInput);
 
 		backgroundSprite = FlxDestroyUtil.destroy(backgroundSprite);
 		fieldBorderSprite = FlxDestroyUtil.destroy(fieldBorderSprite);
@@ -324,18 +324,22 @@ class FlxInputText extends FlxText
 			}
 		}
 		#end
-		if (hasFocus && FlxG.keys.justPressed.V && FlxG.keys.pressed.CONTROL) {
+		if (hasFocus && FlxG.keys.justPressed.V && FlxG.keys.pressed.CONTROL)
+		{
 			var text = Clipboard.generalClipboard.getData(TEXT_FORMAT);
-			if (text != null) onTextInput(text);
+			if (text != null)
+				onTextInput(text);
 		}
 	}
 
-    private function onTextInput(text:String) {
-        if (!hasFocus) return;
-        var newText = this.text.substr(0, caretIndex) + text + this.text.substr(caretIndex);
-        this.text = newText;
-        caretIndex += text.length;
-    }
+	private function onTextInput(text:String)
+	{
+		if (!hasFocus)
+			return;
+		var newText = this.text.substr(0, caretIndex) + text + this.text.substr(caretIndex);
+		this.text = newText;
+		caretIndex += text.length;
+	}
 
 	/**
 	 * Handles keypresses generated on the stage.
@@ -403,28 +407,9 @@ class FlxInputText extends FlxText
 			// Enter
 			else if (key == 13)
 			{
-                if (lines == -1) onTextInput("\n");
+				if (lines == -1)
+					onTextInput("\n");
 				onChange(ENTER_ACTION);
-			}
-			// Actually add some text
-			else
-			{
-                /*
-                    Now handled via `FlxG.textInput`
-                */
-				// if (e.charCode == 0) // non-printable characters crash String.fromCharCode
-				// {
-				// 	return;
-				// }
-				// var newText:String = filter(String.fromCharCode(e.charCode));
-
-				// if (newText.length > 0 && (maxLength == 0 || (text.length + newText.length) < maxLength))
-				// {
-				// 	text = insertSubstring(text, newText, caretIndex);
-				// 	caretIndex++;
-				// 	onChange(INPUT_ACTION);
-				// }
-                
 			}
 		}
 	}
@@ -553,11 +538,9 @@ class FlxInputText extends FlxText
 				switch (getAlignStr())
 				{
 					case RIGHT:
-						X = X - textField.width + textField.textWidth
-							;
+						X = X - textField.width + textField.textWidth;
 					case CENTER:
-						X = X - textField.width / 2 + textField.textWidth / 2
-							;
+						X = X - textField.width / 2 + textField.textWidth / 2;
 					default:
 				}
 			}

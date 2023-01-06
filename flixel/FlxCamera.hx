@@ -1,9 +1,3 @@
-/*
-	-- YOSHI ENGINE FIXES --
-	Fixed following scrolling speed being different based on FPS.
-	Fixed Shader resizing problem (old fix from hazard24, new fix in)
- */
-
 package flixel;
 
 import lime.app.Application;

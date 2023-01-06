@@ -177,11 +177,6 @@ class FlxG
 	 */
 	public static var onMobile(get, never):Bool;
 
-	/**
-		For correct text input (YoshiCrafter Engine ftw)
-	**/
-	public static var textInput:TextInput;
-
 	public static var renderMethod(default, null):FlxRenderMethod;
 
 	public static var renderBlit(default, null):Bool;
@@ -659,8 +654,6 @@ class FlxG
 		#if FLX_SOUND_SYSTEM
 		sound = new SoundFrontEnd();
 		#end
-
-		textInput = new TextInput();
 	}
 
 	static function initRenderMethod():Void
