@@ -131,6 +131,7 @@ class FlxDefines
 		defineInversion(FLX_NO_SOUND_SYSTEM, FLX_SOUND_SYSTEM);
 		defineInversion(FLX_NO_FOCUS_LOST_SCREEN, FLX_FOCUS_LOST_SCREEN);
 		defineInversion(FLX_NO_DEBUG, FLX_DEBUG);
+		defineInversion(FLX_NO_POINT_POOL, FLX_POINT_POOL);
 	}
 
 	static function defineHelperDefines()
