@@ -86,6 +86,11 @@ class FlxG
 	public static var forceNoAntialiasing = false;
 
 	/**
+	 * Whenever to show any destroyed graphics.
+	 */
+	public static var showDestroyedGraphics = false;
+
+	/**
 	 * Whether the game should be paused when focus is lost or not. Use `-D FLX_NO_FOCUS_LOST_SCREEN`
 	 * if you only want to get rid of the default pause screen.
 	 * Override `onFocus()` and `onFocusLost()` for your own behaviour in your state.

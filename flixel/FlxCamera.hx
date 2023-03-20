@@ -592,6 +592,33 @@ class FlxCamera extends FlxBasic
 		var itemToReturn = null;
 		var blendInt:Int = FlxDrawBaseItem.blendToInt(blend);
 
+		if (_headTiles != null && shader != null && _headTiles.shader != null && _headTiles.shader._instance != null && shader._instance != null)
+		{
+			// trace("");
+			// trace(_currentDrawItem.type == FlxDrawItemType.TILES);
+			// trace(_headTiles.graphics == graphic);
+			// trace(_headTiles.colored == colored);
+			// trace(_headTiles.hasColorOffsets == hasColorOffsets);
+			// trace(_headTiles.blending == blendInt);
+			// trace(_headTiles.blend == blend);
+			// trace(_headTiles.antialiasing == smooth);
+			// trace((_headTiles.shader == shader) + " " + (_headTiles.shader._instance == shader._instance));
+			// trace(((shader == null /* || _headTiles.program == shader.program*/)
+			//	|| (_headTiles.shader == shader || _headTiles.shader._instance == shader._instance)));
+			// trace(_currentDrawItem != null
+			//	&& _currentDrawItem.type == FlxDrawItemType.TILES
+			//	&& _headTiles.graphics == graphic
+			//	&& _headTiles.colored == colored
+			//	&& _headTiles.hasColorOffsets == hasColorOffsets
+			//	&& _headTiles.blending == blendInt
+			//	&& _headTiles.blend == blend
+			//	&& _headTiles.antialiasing == smooth
+			//	&& ((shader == null /* || _headTiles.program == shader.program*/)
+			//		|| (_headTiles.shader == shader || _headTiles.shader._instance == shader._instance)));
+		}
+
+		var instance = shader != null ? shader._instance : null;
+
 		if (_currentDrawItem != null
 			&& _currentDrawItem.type == FlxDrawItemType.TILES
 			&& _headTiles.graphics == graphic
@@ -600,7 +627,9 @@ class FlxCamera extends FlxBasic
 			&& _headTiles.blending == blendInt
 			&& _headTiles.blend == blend
 			&& _headTiles.antialiasing == smooth
-			&& _headTiles.shader == shader)
+			&& _headTiles.shader == shader
+			&& _headTiles.instance == instance)
+			// && ((_headTiles.shader == shader || _headTiles.shader._instance == shader._instance)))
 		{
 			return _headTiles;
 		}
@@ -624,6 +653,8 @@ class FlxCamera extends FlxBasic
 		itemToReturn.blending = blendInt;
 		itemToReturn.blend = blend;
 		itemToReturn.shader = shader;
+		itemToReturn.instance = instance;
+		// itemToReturn.useInstanceShader = shader._instance != null;
 
 		itemToReturn.nextTyped = _headTiles;
 		_headTiles = itemToReturn;

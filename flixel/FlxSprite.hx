@@ -693,8 +693,13 @@ class FlxSprite extends FlxObject
 	{
 		checkEmptyFrame();
 
-		if (alpha == 0 || _frame == null || _frame.type == FlxFrameType.EMPTY || _frame.parent.width == 0 || _frame.parent.height == 0
-			|| !_frame.parent.bitmap.readable || graphic.shader == null)
+		if (alpha == 0
+			|| _frame == null
+			|| _frame.type == FlxFrameType.EMPTY
+			|| _frame.parent.width == 0
+			|| _frame.parent.height == 0
+			|| !_frame.parent.bitmap.readable
+			|| (!FlxG.showDestroyedGraphics && graphic.shader == null))
 			return;
 
 		if (dirty) // rarely
