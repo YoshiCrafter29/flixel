@@ -1,5 +1,6 @@
 package flixel.addons.ui;
 
+import flixel.util.FlxDestroyUtil;
 import flixel.addons.ui.interfaces.IFlxUIButton;
 import flixel.addons.ui.interfaces.IFlxUIWidget;
 import flixel.FlxObject;
@@ -186,10 +187,8 @@ class FlxUIList extends FlxUIGroup
 	{
 		prevButton = null;
 		nextButton = null;
-		prevButtonOffset.put();
-		nextButtonOffset.put();
-		prevButtonOffset = null;
-		nextButtonOffset = null;
+		prevButtonOffset = FlxDestroyUtil.put(prevButtonOffset);
+		nextButtonOffset = FlxDestroyUtil.put(nextButtonOffset);
 		super.destroy();
 	}
 

@@ -122,17 +122,14 @@ class FlxTrail extends FlxSpriteGroup
 
 	override public function destroy():Void
 	{
-		FlxDestroyUtil.putArray(_recentPositions);
-		FlxDestroyUtil.putArray(_recentScales);
-
 		_recentAngles = null;
-		_recentPositions = null;
-		_recentScales = null;
+		_recentPositions = FlxDestroyUtil.putArray(_recentPositions);
+		_recentScales = FlxDestroyUtil.putArray(_recentScales);
 		_recentFrames = null;
 		_recentFlipX = null;
 		_recentFlipY = null;
 		_recentAnimations = null;
-		_spriteOrigin = null;
+		_spriteOrigin = FlxDestroyUtil.put(_spriteOrigin);
 
 		target = null;
 		_graphic = null;

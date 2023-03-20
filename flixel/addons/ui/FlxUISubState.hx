@@ -206,8 +206,8 @@ class FlxUISubState extends FlxSubState implements IFlxUIState
 
 		if (_ui != null)
 		{
-			_ui.destroy();
 			remove(_ui, true);
+			_ui.destroy();
 			_ui = null;
 		}
 

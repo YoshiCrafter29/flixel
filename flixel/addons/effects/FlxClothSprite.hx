@@ -146,6 +146,7 @@ class FlxClothSprite extends FlxSprite
 
 		meshVelocity = FlxDestroyUtil.put(meshVelocity);
 		meshFriction = FlxDestroyUtil.put(meshFriction);
+		meshScale = FlxDestroyUtil.put(meshScale);
 		meshPixels = FlxDestroyUtil.dispose(meshPixels);
 
 		super.destroy();

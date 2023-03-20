@@ -1,7 +1,5 @@
 package flixel.addons.ui;
 
-import openfl.desktop.Clipboard;
-import lime.app.Application;
 import flash.errors.Error;
 import flash.events.KeyboardEvent;
 import flash.geom.Rectangle;
@@ -15,6 +13,11 @@ import flixel.util.FlxColor;
 import flixel.util.FlxDestroyUtil;
 import flixel.util.FlxTimer;
 
+/*
+ * Fixes:
+ * to fix bugs where the mouse checks didn't account for the zoom of the camera
+ * Reduced draw calls
+ */
 /**
  * FlxInputText v1.11, ported to Haxe
  * @author larsiusprime, (Lars Doucet)
@@ -45,13 +48,15 @@ class FlxInputText extends FlxText
 	public static inline var ENTER_ACTION:String = "enter"; // press enter
 	public static inline var INPUT_ACTION:String = "input"; // manually edit
 
+	public var text_dirty:Bool = true;
+
 	/**
 	 * This regular expression will filter out (remove) everything that matches.
 	 * Automatically sets filterMode = FlxInputText.CUSTOM_FILTER.
 	 */
 	public var customFilterPattern(default, set):EReg;
 
-	function set_customFilterPattern(cfp:EReg)
+	inline function set_customFilterPattern(cfp:EReg)
 	{
 		customFilterPattern = cfp;
 		filterMode = CUSTOM_FILTER;
@@ -73,19 +78,19 @@ class FlxInputText extends FlxText
 	 */
 	public var caretColor(default, set):Int;
 
-	function set_caretColor(i:Int):Int
+	inline function set_caretColor(i:Int):Int
 	{
 		caretColor = i;
-		dirty = true;
+		text_dirty = true;
 		return caretColor;
 	}
 
 	public var caretWidth(default, set):Int = 1;
 
-	function set_caretWidth(i:Int):Int
+	inline function set_caretWidth(i:Int):Int
 	{
 		caretWidth = i;
-		dirty = true;
+		text_dirty = true;
 		return caretWidth;
 	}
 
@@ -173,13 +178,11 @@ class FlxInputText extends FlxText
 	/**
 	 * A FlxSprite representing the fieldBorders.
 	 */
-	private var fieldBorderSprite:FlxSprite;
-
-	/**
-	 * The left- and right- most fully visible character indeces
+	// private var fieldBorderSprite:FlxSprite;
+	/*
+		The left- and right- most fully visible character indeces
 	 */
-	private var _scrollBoundIndeces:{left:Int, right:Int} = {left: 0, right: 0};
-
+	// private var _scrollBoundIndeces:{left:Int, right:Int} = {left: 0, right: 0};
 	// workaround to deal with non-availability of getCharIndexAtPoint or getCharBoundaries on cpp/neko targets
 	private var _charBoundaries:Array<FlxRect>;
 
@@ -214,19 +217,23 @@ class FlxInputText extends FlxText
 
 		caret = new FlxSprite();
 		caret.makeGraphic(caretWidth, Std.int(size + 2));
-		_caretTimer = new FlxTimer();
+		caret.active = false;
+		caret.exists = false;
+		// _caretTimer = new FlxTimer();
 
 		caretIndex = 0;
 		hasFocus = false;
 		if (background)
 		{
-			fieldBorderSprite = new FlxSprite(X, Y);
+			// fieldBorderSprite = new FlxSprite(X, Y);
 			backgroundSprite = new FlxSprite(X, Y);
+
+			// fieldBorderSprite.active = false;
+			backgroundSprite.active = false;
 		}
 
 		lines = 1;
 		FlxG.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
-		Application.current.window.onTextInput.add(onTextInput);
 
 		if (Text == null)
 		{
@@ -244,22 +251,27 @@ class FlxInputText extends FlxText
 	override public function destroy():Void
 	{
 		FlxG.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
-		Application.current.window.onTextInput.remove(onTextInput);
 
 		backgroundSprite = FlxDestroyUtil.destroy(backgroundSprite);
-		fieldBorderSprite = FlxDestroyUtil.destroy(fieldBorderSprite);
+		// fieldBorderSprite = FlxDestroyUtil.destroy(fieldBorderSprite);
 		caret = FlxDestroyUtil.destroy(caret);
+		if (_caretTimer != null)
+		{
+			_caretTimer.cancel();
+		}
+		_caretTimer = FlxDestroyUtil.destroy(_caretTimer);
 		callback = null;
 
 		#if sys
-		if (_charBoundaries != null)
-		{
-			while (_charBoundaries.length > 0)
+		/*if (_charBoundaries != null)
 			{
-				_charBoundaries.pop();
-			}
-			_charBoundaries = null;
-		}
+				while (_charBoundaries.length > 0)
+				{
+					_charBoundaries.pop().put();
+				}
+				_charBoundaries = null;
+		}*/
+		_charBoundaries = FlxDestroyUtil.putArray(_charBoundaries);
 		#end
 
 		super.destroy();
@@ -270,27 +282,32 @@ class FlxInputText extends FlxText
 	 */
 	override public function draw():Void
 	{
-		drawSprite(fieldBorderSprite);
+		// drawSprite(fieldBorderSprite);
 		drawSprite(backgroundSprite);
+
+		dirty = text_dirty;
 
 		super.draw();
 
-		// In case caretColor was changed
-		if (caretColor != caret.color || caret.height != size + 2)
+		if (caret.exists)
 		{
-			caret.color = caretColor;
-		}
+			// In case caretColor was changed
+			if (caretColor != caret.color || caret.height != size + 2)
+			{
+				caret.color = caretColor;
+			}
 
-		drawSprite(caret);
+			drawSprite(caret);
+		}
 	}
 
 	/**
 	 * Helper function that makes sure sprites are drawn up even though they haven't been added.
 	 * @param	Sprite		The Sprite to be drawn.
 	 */
-	private function drawSprite(Sprite:FlxSprite):Void
+	private inline function drawSprite(Sprite:FlxSprite):Void
 	{
-		if (Sprite != null && Sprite.visible)
+		if (Sprite != null && Sprite.visible && Sprite.exists)
 		{
 			Sprite.scrollFactor = scrollFactor;
 			Sprite.cameras = cameras;
@@ -309,10 +326,22 @@ class FlxInputText extends FlxText
 		// Set focus and caretIndex as a response to mouse press
 		if (FlxG.mouse.justPressed)
 		{
-			var hadFocus:Bool = hasFocus;
-			if (FlxG.mouse.overlaps(this))
+			var overlap:Bool = false;
+			var spriteCamera = camera;
+			for (camera in cameras)
 			{
-				caretIndex = getCaretIndex();
+				if (overlapsPoint(FlxG.mouse.getWorldPosition(camera), true, camera))
+				{
+					overlap = true;
+					spriteCamera = camera;
+					break;
+				}
+			}
+
+			var hadFocus:Bool = hasFocus;
+			if (overlap)
+			{
+				caretIndex = getCaretIndex(spriteCamera);
 				hasFocus = true;
 				if (!hadFocus && focusGained != null)
 					focusGained();
@@ -325,21 +354,6 @@ class FlxInputText extends FlxText
 			}
 		}
 		#end
-		if (hasFocus && FlxG.keys.justPressed.V && FlxG.keys.pressed.CONTROL)
-		{
-			var text = Clipboard.generalClipboard.getData(TEXT_FORMAT);
-			if (text != null)
-				onTextInput(text);
-		}
-	}
-
-	private function onTextInput(text:String)
-	{
-		if (!hasFocus)
-			return;
-		var newText = this.text.substr(0, caretIndex) + text + this.text.substr(caretIndex);
-		this.text = newText;
-		caretIndex += text.length;
 	}
 
 	/**
@@ -347,10 +361,9 @@ class FlxInputText extends FlxText
 	 */
 	private function onKeyDown(e:KeyboardEvent):Void
 	{
-		var key:Int = e.keyCode;
-
 		if (hasFocus)
 		{
+			var key:Int = e.keyCode;
 			// Do nothing for Shift, Ctrl, Esc, and flixel console hotkey
 			if (key == 16 || key == 17 || key == 220 || key == 27)
 			{
@@ -408,9 +421,23 @@ class FlxInputText extends FlxText
 			// Enter
 			else if (key == 13)
 			{
-				if (lines == -1)
-					onTextInput("\n");
 				onChange(ENTER_ACTION);
+			}
+			// Actually add some text
+			else
+			{
+				if (e.charCode == 0) // non-printable characters crash String.fromCharCode
+				{
+					return;
+				}
+				var newText:String = filter(String.fromCharCode(e.charCode));
+
+				if (newText.length > 0 && (maxLength == 0 || (text.length + newText.length) < maxLength))
+				{
+					text = insertSubstring(text, newText, caretIndex);
+					caretIndex++;
+					onChange(INPUT_ACTION);
+				}
 			}
 		}
 	}
@@ -449,11 +476,14 @@ class FlxInputText extends FlxText
 	 * @return The index of the character.
 	 *         between 0 and the length of the text
 	 */
-	private function getCaretIndex():Int
+	private function getCaretIndex(camera:FlxCamera):Int
 	{
 		#if FLX_MOUSE
-		var hit = FlxPoint.get(FlxG.mouse.x - x, FlxG.mouse.y - y);
-		return getCharIndexAtPoint(hit.x, hit.y);
+		var mousePos = FlxG.mouse.getWorldPosition(camera);
+		var hit = FlxPoint.get(mousePos.x - x, mousePos.y - y);
+		var value = getCharIndexAtPoint(hit.x, hit.y);
+		hit.put();
+		return value;
 		#else
 		return 0;
 		#end
@@ -585,7 +615,7 @@ class FlxInputText extends FlxText
 			var diff:Int = _charBoundaries.length - numChars;
 			for (i in 0...diff)
 			{
-				_charBoundaries.pop();
+				_charBoundaries.pop().put();
 			}
 		}
 
@@ -649,27 +679,38 @@ class FlxInputText extends FlxText
 	{
 		super.calcFrame(RunOnCpp);
 
-		if (fieldBorderSprite != null)
-		{
-			if (fieldBorderThickness > 0)
-			{
-				fieldBorderSprite.makeGraphic(Std.int(width + fieldBorderThickness * 2), Std.int(height + fieldBorderThickness * 2), fieldBorderColor);
-				fieldBorderSprite.x = x - fieldBorderThickness;
-				fieldBorderSprite.y = y - fieldBorderThickness;
-			}
-			else if (fieldBorderThickness == 0)
-			{
-				fieldBorderSprite.visible = false;
-			}
-		}
+		if (!text_dirty)
+			return;
+
+		text_dirty = false;
 
 		if (backgroundSprite != null)
 		{
 			if (background)
 			{
-				backgroundSprite.makeGraphic(Std.int(width), Std.int(height), backgroundColor);
-				backgroundSprite.x = x;
-				backgroundSprite.y = y;
+				var width = Std.int(width) + fieldBorderThickness * 2;
+				var height = Std.int(height) + fieldBorderThickness * 2;
+
+				var hasBorder = fieldBorderThickness > 0;
+
+				var inner = hasBorder ? backgroundColor : fieldBorderColor;
+				var outer = hasBorder ? fieldBorderColor : backgroundColor;
+
+				var bgKey:String = "backgroundSprite" + width + "x" + height + "co:" + outer;
+				if (hasBorder)
+				{
+					bgKey += "ci:" + inner;
+					bgKey += "t:" + fieldBorderThickness;
+				}
+				backgroundSprite.makeGraphic(width, height, outer, false, bgKey);
+				if (hasBorder)
+				{
+					var r:Rectangle = new Rectangle(fieldBorderThickness, fieldBorderThickness, width - 2, height - 2);
+					backgroundSprite.pixels.fillRect(r, inner); // draw border
+				}
+				backgroundSprite.updateHitbox();
+				backgroundSprite.x = x - fieldBorderThickness;
+				backgroundSprite.y = y - fieldBorderThickness;
 			}
 			else
 			{
@@ -696,7 +737,7 @@ class FlxInputText extends FlxText
 				case NONE:
 					// No border, just make the caret
 					caret.makeGraphic(cw, ch, caretC, false, caretKey);
-					caret.offset.x = caret.offset.y = 0;
+					caret.offset.set(0, 0);
 
 				case SHADOW:
 					// Shadow offset to the lower-right
@@ -707,7 +748,7 @@ class FlxInputText extends FlxText
 					caret.pixels.fillRect(r, borderC); // draw shadow
 					r.x = r.y = 0;
 					caret.pixels.fillRect(r, caretC); // draw caret
-					caret.offset.x = caret.offset.y = 0;
+					caret.offset.set(0, 0);
 
 				case OUTLINE_FAST, OUTLINE:
 					// Border all around it
@@ -732,7 +773,7 @@ class FlxInputText extends FlxText
 	 */
 	private function toggleCaret(timer:FlxTimer):Void
 	{
-		caret.visible = !caret.visible;
+		caret.exists = !caret.exists;
 	}
 
 	/**
@@ -785,26 +826,18 @@ class FlxInputText extends FlxText
 
 	private override function set_x(X:Float):Float
 	{
-		if ((fieldBorderSprite != null) && fieldBorderThickness > 0)
-		{
-			fieldBorderSprite.x = X - fieldBorderThickness;
-		}
 		if ((backgroundSprite != null) && background)
 		{
-			backgroundSprite.x = X;
+			backgroundSprite.x = X - fieldBorderThickness;
 		}
 		return super.set_x(X);
 	}
 
 	private override function set_y(Y:Float):Float
 	{
-		if ((fieldBorderSprite != null) && fieldBorderThickness > 0)
-		{
-			fieldBorderSprite.y = Y - fieldBorderThickness;
-		}
 		if ((backgroundSprite != null) && background)
 		{
-			backgroundSprite.y = Y;
+			backgroundSprite.y = Y - fieldBorderThickness;
 		}
 		return super.set_y(Y);
 	}
@@ -815,18 +848,24 @@ class FlxInputText extends FlxText
 		{
 			if (hasFocus != newFocus)
 			{
+				if (_caretTimer != null)
+				{
+					_caretTimer.cancel();
+					_caretTimer = FlxDestroyUtil.destroy(_caretTimer);
+				}
 				_caretTimer = new FlxTimer().start(0.5, toggleCaret, 0);
-				caret.visible = true;
+				caret.exists = true;
 				caretIndex = text.length;
 			}
 		}
 		else
 		{
 			// Graphics
-			caret.visible = false;
+			caret.exists = false;
 			if (_caretTimer != null)
 			{
 				_caretTimer.cancel();
+				_caretTimer = FlxDestroyUtil.destroy(_caretTimer);
 			}
 		}
 
@@ -926,7 +965,7 @@ class FlxInputText extends FlxText
 		return caretIndex;
 	}
 
-	private function set_forceCase(Value:Int):Int
+	private inline function set_forceCase(Value:Int):Int
 	{
 		forceCase = Value;
 		text = filter(text);
@@ -955,7 +994,7 @@ class FlxInputText extends FlxText
 		if (Value == 0)
 			return 0;
 
-		if (Value > 1 || Value == -1)
+		if (Value > 1)
 		{
 			textField.wordWrap = true;
 			textField.multiline = true;
@@ -967,11 +1006,12 @@ class FlxInputText extends FlxText
 		}
 
 		lines = Value;
+		text_dirty = true;
 		calcFrame();
 		return lines;
 	}
 
-	private function get_passwordMode():Bool
+	private inline function get_passwordMode():Bool
 	{
 		return textField.displayAsPassword;
 	}
@@ -979,6 +1019,7 @@ class FlxInputText extends FlxText
 	private function set_passwordMode(value:Bool):Bool
 	{
 		textField.displayAsPassword = value;
+		text_dirty = true;
 		calcFrame();
 		return value;
 	}
@@ -993,6 +1034,7 @@ class FlxInputText extends FlxText
 	private function set_fieldBorderColor(Value:Int):Int
 	{
 		fieldBorderColor = Value;
+		text_dirty = true;
 		calcFrame();
 		return fieldBorderColor;
 	}
@@ -1000,6 +1042,7 @@ class FlxInputText extends FlxText
 	private function set_fieldBorderThickness(Value:Int):Int
 	{
 		fieldBorderThickness = Value;
+		text_dirty = true;
 		calcFrame();
 		return fieldBorderThickness;
 	}
@@ -1007,6 +1050,7 @@ class FlxInputText extends FlxText
 	private function set_backgroundColor(Value:Int):Int
 	{
 		backgroundColor = Value;
+		text_dirty = true;
 		calcFrame();
 		return backgroundColor;
 	}

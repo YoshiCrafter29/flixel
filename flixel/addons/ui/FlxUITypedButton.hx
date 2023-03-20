@@ -98,8 +98,7 @@ class FlxUITypedButton<T:FlxSprite> extends FlxTypedButton<T> implements IFlxUIB
 	{
 		if (label != null)
 		{
-			toggle_label = f;
-			return toggle_label;
+			return toggle_label = f;
 		}
 		return null;
 	}
@@ -126,21 +125,20 @@ class FlxUITypedButton<T:FlxSprite> extends FlxTypedButton<T> implements IFlxUIB
 
 	private function set_skipButtonUpdate(b:Bool):Bool
 	{
-		skipButtonUpdate = b;
-		return skipButtonUpdate;
+		return skipButtonUpdate = b;
 	}
 
 	public var params(default, set):Array<Dynamic>;
 
 	private function set_params(p:Array<Dynamic>):Array<Dynamic>
 	{
-		params = p;
-		return params;
+		return params = p;
 	}
 
 	public override function destroy():Void
 	{
 		resize_point = FlxDestroyUtil.put(resize_point);
+		_centerLabelOffset = FlxDestroyUtil.put(_centerLabelOffset);
 		super.destroy();
 	}
 
@@ -192,13 +190,18 @@ class FlxUITypedButton<T:FlxSprite> extends FlxTypedButton<T> implements IFlxUIB
 		tile = other.tile;
 		resize_ratio = other.resize_ratio;
 
+		if (_centerLabelOffset != null)
+		{
+			_centerLabelOffset.put();
+		}
+
 		if (other._centerLabelOffset == null)
 		{
 			_centerLabelOffset = null;
 		}
 		else
 		{
-			_centerLabelOffset = new FlxPoint(other._centerLabelOffset.x, other._centerLabelOffset.y);
+			_centerLabelOffset = FlxPoint.get(other._centerLabelOffset.x, other._centerLabelOffset.y);
 		}
 
 		_no_graphic = other._no_graphic;
@@ -242,6 +245,7 @@ class FlxUITypedButton<T:FlxSprite> extends FlxTypedButton<T> implements IFlxUIB
 
 		var ctPt:FlxPoint = other.getCenterLabelOffset();
 		setCenterLabelOffset(ctPt.x, ctPt.y);
+		ctPt.put();
 
 		var i:Int = 0;
 		for (flxPt in other.labelOffsets)
@@ -875,11 +879,9 @@ class FlxUITypedButton<T:FlxSprite> extends FlxTypedButton<T> implements IFlxUIB
 
 		// If we've gotten here there's no shortcuts we need to draw the actual button graphic
 
-		var normalPixels:BitmapData = null;
-
 		if (!has_toggle)
 		{
-			normalPixels = assembleButtonFrames(arr_bmpData[frame_indeces[0]], arr_bmpData[frame_indeces[1]], arr_bmpData[frame_indeces[2]]);
+			var normalPixels:BitmapData = assembleButtonFrames(arr_bmpData[frame_indeces[0]], arr_bmpData[frame_indeces[1]], arr_bmpData[frame_indeces[2]]);
 			FlxG.bitmap.add(normalPixels, true, key);
 			loadGraphic(key, true, W, H);
 		}

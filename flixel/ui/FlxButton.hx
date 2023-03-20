@@ -364,6 +364,7 @@ class FlxTypedButton<T:FlxSprite> extends FlxSprite implements IFlxInput
 			var tileSize:FlxPoint = FlxPoint.get(buttonFrames.tileSize.x, buttonFrames.tileSize.y);
 			var tileFrames:FlxTileFrames = buttonNode.getTileFrames(tileSize);
 			this.frames = tileFrames;
+			// might need to tileSize.put();
 		}
 
 		if (result && label != null)

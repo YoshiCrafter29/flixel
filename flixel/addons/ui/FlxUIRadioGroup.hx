@@ -185,13 +185,13 @@ class FlxUIRadioGroup extends FlxUIGroup implements IFlxUIClickable implements I
 		if (_list_radios != null)
 		{
 			U.clearArray(_list_radios);
+			_list_radios = null;
 		}
 		if (_list_active != null)
 		{
 			U.clearArray(_list_active);
+			_list_active = null;
 		}
-		_list_active = null;
-		_list_radios = null;
 		_list = null;
 		_ids = null;
 		_labels = null;

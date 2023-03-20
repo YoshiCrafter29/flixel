@@ -1,5 +1,6 @@
 package flixel.addons.ui;
 
+import flixel.util.FlxDestroyUtil;
 import flixel.addons.ui.FlxUI.UIEventCallback;
 import flixel.addons.ui.interfaces.IFlxUIWidget;
 import flixel.addons.ui.interfaces.IResizable;
@@ -138,6 +139,7 @@ class FlxUISprite extends FlxSprite implements IFlxUIWidget implements IResizabl
 
 	public override function destroy():Void
 	{
+		resize_point = FlxDestroyUtil.put(resize_point);
 		ptr_owner = null;
 		super.destroy();
 	}

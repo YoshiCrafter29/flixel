@@ -1,8 +1,8 @@
 /*
- -- YOSHI ENGINE FIXES --
- Fixed weird bar chunk filling
- Fixed percentage returning floor of percentage instead of the percentage itself
-*/
+	-- YOSHI ENGINE FIXES --
+	Fixed weird bar chunk filling
+	Fixed percentage returning floor of percentage instead of the percentage itself
+ */
 
 package flixel.ui;
 
@@ -225,7 +225,7 @@ class FlxBar extends FlxSprite
 		_filledBarPoint = null;
 
 		parent = null;
-		positionOffset = null;
+		positionOffset = FlxDestroyUtil.put(positionOffset);
 		emptyCallback = null;
 		filledCallback = null;
 
@@ -924,10 +924,9 @@ class FlxBar extends FlxSprite
 			return _maxPercent;
 		}
 
-        // why the fuck would we need to floor that it's literally returning as a float
+		// why the fuck would we need to floor that it's literally returning as a float
 		return ((value - min) / range) * _maxPercent;
 	}
-
 
 	function get_floorPercent():Int
 	{

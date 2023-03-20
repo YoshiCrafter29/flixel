@@ -43,10 +43,12 @@ class FlxUIState extends FlxState implements IEventGetter implements IFlxUIState
 	public var hideCursorOnSubstate:Bool = false;
 	private var _cursorHidden:Bool = false;
 	#end
+
 	/**
 	 * frontend for adding tooltips to things
 	 */
 	public var tooltips(default, null):FlxUITooltipManager;
+
 	private var _xml_id:String = ""; // the xml file to load from assets
 	#if (debug && sys)
 	// If you want to do live reloading, set the path to your assets directory on your local disk here,
@@ -61,15 +63,18 @@ class FlxUIState extends FlxState implements IEventGetter implements IFlxUIState
 	private var _ui:FlxUI;
 	private var _tongue:IFireTongue;
 	public static var static_tongue:IFireTongue = null;
+
 	// if this is not null, each state will grab this auto-magically
 	// otherwise it's up to you to set _tongue before the UI stuff loads.
 	#if (debug && sys)
 	public static var static_liveFilePath:String = "";
+
 	// if this is not "", each state will grab this auto-magically
 	// otherwise it's up to you to set _liveFilePath before the UI stuff loads.
 	#end
 	#if (debug && sys)
 	public var reload_ui_on_asset_change(default, set):Bool;
+
 	// setting this to true will add a listener to reload the UI when assets are updated ("openfl update <proj> <target>" in OpenFL 2.0)
 	// cpp/neko only
 	#end
@@ -207,7 +212,8 @@ class FlxUIState extends FlxState implements IEventGetter implements IFlxUIState
 		cleanup();
 	}
 
-	override public function update(elapsed:Float):Void
+	override
+	public function update(elapsed:Float):Void
 	{
 		super.update(elapsed);
 		if (tooltips != null)
@@ -317,8 +323,8 @@ class FlxUIState extends FlxState implements IEventGetter implements IFlxUIState
 
 		if (_ui != null)
 		{
-			_ui.destroy();
 			remove(_ui, true);
+			_ui.destroy();
 			_ui = null;
 		}
 

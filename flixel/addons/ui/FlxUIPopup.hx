@@ -1,5 +1,6 @@
 package flixel.addons.ui;
 
+import flixel.util.FlxDestroyUtil;
 import flixel.addons.ui.interfaces.IFlxUIButton;
 import flixel.addons.ui.interfaces.IFlxUIState;
 import flixel.addons.ui.interfaces.IFlxUIWidget;
@@ -148,6 +149,15 @@ class FlxUIPopup extends FlxUISubState implements IFlxUIWidget
 
 		scrollFactor.set(0, 0);
 		_ui.setScrollFactor(0, 0);
+	}
+
+	override function destroy()
+	{
+		scrollFactor = FlxDestroyUtil.put(scrollFactor);
+		offset = FlxDestroyUtil.put(offset); // remove if it causes issues
+		origin = FlxDestroyUtil.put(origin); // remove if it causes issues
+		scale = FlxDestroyUtil.put(scale); // remove if it causes issues
+		super.destroy();
 	}
 
 	/**
