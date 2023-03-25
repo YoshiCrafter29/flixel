@@ -605,7 +605,7 @@ class FlxGraphic implements IFlxDestroyable
 
 	function set_useCount(Value:Int):Int
 	{
-		if (Value <= 0 && _destroyOnNoUse && !persist)
+		if (!FlxG.bitmap.__doNotDelete && Value <= 0 && _destroyOnNoUse && !persist)
 			FlxG.bitmap.remove(this);
 
 		return _useCount = Value;
@@ -618,7 +618,7 @@ class FlxGraphic implements IFlxDestroyable
 
 	function set_destroyOnNoUse(Value:Bool):Bool
 	{
-		if (Value && _useCount <= 0 && key != null && !persist)
+		if (Value && !FlxG.bitmap.__doNotDelete &&  _useCount <= 0 && key != null && !persist)
 			FlxG.bitmap.remove(this);
 
 		return _destroyOnNoUse = Value;

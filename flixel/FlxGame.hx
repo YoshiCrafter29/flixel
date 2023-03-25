@@ -632,21 +632,17 @@ class FlxGame extends Sprite
 			FlxRandom.updateStateSeed();
 			#end
 		}
-
-		// Destroy the old state (if there is an old state)
-		if (_state != null)
-			_state.destroy();
-
-		if (resetStuffOnSwitch)
-		{
-			// we need to clear bitmap cache only after previous state is destroyed, which will reset useCount for FlxGraphic objects
+		
+		if (resetStuffOnSwitch) {
 			FlxG.bitmap.mapCacheAsDestroyable();
-
-			// clearing shaders cause people love fucking around
 			_filters = [];
 			filtersEnabled = true;
 		}
 
+		// Destroy the old state (if there is an old state)
+		if (_state != null)
+			_state.destroy();
+		
 		// Finally assign and create the new state
 		_state = _requestedState;
 
@@ -666,7 +662,6 @@ class FlxGame extends Sprite
 		debugger.console.registerObject("state", _state);
 		#end
 
-		FlxG.signals.postStateSwitch.dispatch();
 
 		if (!_state.postCreated)
 			_state.createPost();
@@ -675,6 +670,8 @@ class FlxGame extends Sprite
 			FlxG.bitmap.clearCache();
 		} else
 			resetStuffOnSwitch = true;
+
+		FlxG.signals.postStateSwitch.dispatch();
 	}
 
 	function gameStart():Void

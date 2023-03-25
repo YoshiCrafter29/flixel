@@ -328,6 +328,11 @@ class BitmapFrontEnd
 			remove(graphic);
 	}
 
+	@:allow(flixel.graphics.FlxGraphic)
+	var __doNotDelete:Bool = false;
+
+	var __countCache:Array<FlxGraphic> = [];
+
 	/**
 	 * Clears image cache (and destroys those images).
 	 * Graphics object will be removed and destroyed only if it shouldn't persist in the cache and its useCount is 0.
@@ -340,12 +345,21 @@ class BitmapFrontEnd
 			return;
 		}
 
+		__doNotDelete = false;
+
+		for(g in __countCache)
+			g.useCount -= 10;
+
+		__countCache = [];
+
 		for (key => obj in _cache)
 		{
 			if (obj.mustDestroy)
 			{
 				removeKey(key);
 				obj.destroy();
+			} else if (obj.destroyOnNoUse) {
+				removeIfNoUse(obj);
 			}
 		}
 	}
@@ -358,9 +372,15 @@ class BitmapFrontEnd
 		if (_cache == null)
 			_cache = new Map();
 
+		__countCache = [];
+
+		__doNotDelete = true;
 		for (e in _cache)
-			if (e != null)
-				e.mustDestroy = true;
+			if (e != null) {
+				__countCache.push(e);
+				// e.mustDestroy = true;
+				e.useCount += 10;
+			}
 	}
 
 	inline function removeKey(key:String):Void
