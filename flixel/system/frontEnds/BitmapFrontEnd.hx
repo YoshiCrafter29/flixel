@@ -332,6 +332,7 @@ class BitmapFrontEnd
 	var __doNotDelete:Bool = false;
 
 	var __countCache:Array<FlxGraphic> = [];
+	var __cacheCopy:Map<String, FlxGraphic> = [];
 
 	/**
 	 * Clears image cache (and destroys those images).
@@ -352,15 +353,21 @@ class BitmapFrontEnd
 
 		__countCache = [];
 
-		for (key in _cache.keys())
+		for (key in __cacheCopy.keys())
 		{
-			var obj = get(key);
+			var obj = __cacheCopy.get(key);
+			var objN = get(key);
+			if (objN != null && objN != obj) {
+				obj.destroy();
+			}
 			if (obj.mustDestroy || (obj.destroyOnNoUse && !obj.persist && obj.useCount <= 0))
 			{
 				removeKey(key);
 				obj.destroy();
 			}
 		}
+
+		__cacheCopy = [];
 	}
 
 	/**
@@ -374,7 +381,9 @@ class BitmapFrontEnd
 		__countCache = [];
 
 		__doNotDelete = true;
-		for (e in _cache) {
+		__cacheCopy = [];
+		for (k=>e in _cache) {
+			__cacheCopy.set(k, e);
 			if (e == null) continue;
 			if (e.assetsKey != null) {
 				__countCache.push(e);
@@ -382,6 +391,7 @@ class BitmapFrontEnd
 			}
 			e.mustDestroy = true;
 		}
+		
 	}
 
 	inline function removeKey(key:String):Void
