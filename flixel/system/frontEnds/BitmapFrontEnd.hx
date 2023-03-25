@@ -324,7 +324,7 @@ class BitmapFrontEnd
 
 	public function removeIfNoUse(graphic:FlxGraphic):Void
 	{
-		if (graphic != null && graphic.useCount == 0 && !graphic.persist)
+		if (graphic != null && graphic.useCount <= 0 && !graphic.persist)
 			remove(graphic);
 	}
 
@@ -352,14 +352,13 @@ class BitmapFrontEnd
 
 		__countCache = [];
 
-		for (key => obj in _cache)
+		for (key in _cache.keys())
 		{
-			if (obj.mustDestroy)
+			var obj = get(key);
+			if (obj.mustDestroy || (obj.destroyOnNoUse && !obj.persist && obj.useCount <= 0))
 			{
 				removeKey(key);
 				obj.destroy();
-			} else if (obj.destroyOnNoUse) {
-				removeIfNoUse(obj);
 			}
 		}
 	}
@@ -375,12 +374,14 @@ class BitmapFrontEnd
 		__countCache = [];
 
 		__doNotDelete = true;
-		for (e in _cache)
-			if (e != null) {
+		for (e in _cache) {
+			if (e == null) continue;
+			if (e.assetsKey != null) {
 				__countCache.push(e);
-				// e.mustDestroy = true;
 				e.useCount += 10;
 			}
+			e.mustDestroy = true;
+		}
 	}
 
 	inline function removeKey(key:String):Void
