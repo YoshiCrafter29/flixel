@@ -126,7 +126,7 @@ class FlxGraphic implements IFlxDestroyable
 
 		key = FlxG.bitmap.generateKey(key, Key, Unique);
 		graphic = FlxG.bitmap.get(key);
-		if (graphic != null)
+		if (graphic != null && graphic.bitmap != null && graphic.bitmap.readable)
 			return graphic;
 
 		graphic = createGraphic(Source, key, Unique);

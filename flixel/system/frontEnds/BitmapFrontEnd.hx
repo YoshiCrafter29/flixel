@@ -119,7 +119,8 @@ class BitmapFrontEnd
 	 */
 	public inline function checkCache(Key:String):Bool
 	{
-		return get(Key) != null;
+		var v = get(Key);
+		return v != null && v.bitmap != null && v.bitmap.readable;
 	}
 
 	/**
@@ -383,13 +384,16 @@ class BitmapFrontEnd
 		__doNotDelete = true;
 		__cacheCopy = [];
 		for (k=>e in _cache) {
-			__cacheCopy.set(k, e);
 			if (e == null) continue;
 			if (e.assetsKey != null) {
 				__countCache.push(e);
 				e.useCount += 10;
+			} else if (e.destroyOnNoUse) {
+				FlxG.bitmap.removeByKey(k);
+				continue;
 			}
 			e.mustDestroy = true;
+			__cacheCopy.set(k, e);
 		}
 		
 	}
