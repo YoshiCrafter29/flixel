@@ -142,6 +142,7 @@ import openfl.geom.Point;
 		return result;
 	}
 
+
 	/**
 	 * Operator that divides a point by float, returning a new point.
 	 */
@@ -183,6 +184,7 @@ import openfl.geom.Point;
 	{
 		return a.scale(b);
 	}
+
 
 	/**
 	 * Operator that adds two points, returning a new point.
@@ -1525,114 +1527,118 @@ class FlxBasePoint implements IFlxPooled
 		{
 			put();
 		}
-		#endxw} /**
-		 * Function to compare this FlxBasePoint to another.
-		 *
-		 * @param   point  The other FlxBasePoint to compare to this one.
-		 * @return  True if the FlxBasePoints have the same x and y value, false otherwise.
-		 */
+		#end
+	}
 
-		public inline function equals(point:FlxBasePoint):Bool
+	/**
+	 * Function to compare this FlxBasePoint to another.
+	 *
+	 * @param   point  The other FlxBasePoint to compare to this one.
+	 * @return  True if the FlxBasePoints have the same x and y value, false otherwise.
+	 */
+	public inline function equals(point:FlxBasePoint):Bool
+	{
+		var result = FlxMath.equal(x, point.x) && FlxMath.equal(y, point.y);
+		point.putWeak();
+		return result;
+	}
+
+	/**
+	 * Necessary for IFlxDestroyable.
+	 */
+	public function destroy() {}
+
+	/**
+	 * Convert object to readable string name. Useful for debugging, save games, etc.
+	 */
+	public inline function toString():String
+	{
+		return FlxStringUtil.getDebugString([LabelValuePair.weak("x", x), LabelValuePair.weak("y", y)]);
+	}
+
+	/**
+	 * Necessary for FlxCallbackPoint.
+	 */
+	function set_x(Value:Float):Float
+	{
+		return x = Value;
+	}
+
+	/**
+	 * Necessary for FlxCallbackPoint.
+	 */
+	function set_y(Value:Float):Float
+	{
+		return y = Value;
+	}
+}
+
+
+/**
+ * A FlxPoint that calls a function when set_x(), set_y() or set() is called. Used in FlxSpriteGroup.
+ * IMPORTANT: Calling set(x, y); is MUCH FASTER than setting x and y separately. Needs to be destroyed unlike simple FlxPoints!
+ */
+class FlxCallbackPoint extends FlxBasePoint
+{
+	var _setXCallback:FlxPoint->Void;
+	var _setYCallback:FlxPoint->Void;
+	var _setXYCallback:FlxPoint->Void;
+
+	/**
+	 * If you only specify one callback function, then the remaining two will use the same.
+	 *
+	 * @param	setXCallback	Callback for set_x()
+	 * @param	setYCallback	Callback for set_y()
+	 * @param	setXYCallback	Callback for set()
+	 */
+	public function new(setXCallback:FlxPoint->Void, ?setYCallback:FlxPoint->Void, ?setXYCallback:FlxPoint->Void)
+	{
+		super();
+
+		_setXCallback = setXCallback;
+		_setYCallback = setXYCallback;
+		_setXYCallback = setXYCallback;
+
+		if (_setXCallback != null)
 		{
-			var result = FlxMath.equal(x, point.x) && FlxMath.equal(y, point.y);
-			point.putWeak();
-			return result;
+			if (_setYCallback == null)
+				_setYCallback = setXCallback;
+			if (_setXYCallback == null)
+				_setXYCallback = setXCallback;
 		}
+	}
 
-		/**
-		 * Necessary for IFlxDestroyable.
-		 */
-		public function destroy() {}
+	override public function set(x:Float = 0, y:Float = 0):FlxCallbackPoint
+	{
+		super.set(x, y);
+		if (_setXYCallback != null)
+			_setXYCallback(this);
+		return this;
+	}
 
-		/**
-		 * Convert object to readable string name. Useful for debugging, save games, etc.
-		 */
-		public inline function toString():String
-		{
-			return FlxStringUtil.getDebugString([LabelValuePair.weak("x", x), LabelValuePair.weak("y", y)]);
-		}
+	override function set_x(value:Float):Float
+	{
+		super.set_x(value);
+		if (_setXCallback != null)
+			_setXCallback(this);
+		return value;
+	}
 
-		/**
-		 * Necessary for FlxCallbackPoint.
-		 */
-		function set_x(Value:Float):Float
-		{
-			return x = Value;
-		}
+	override function set_y(value:Float):Float
+	{
+		super.set_y(value);
+		if (_setYCallback != null)
+			_setYCallback(this);
+		return value;
+	}
 
-		/**
-		 * Necessary for FlxCallbackPoint.
-		 */
-		function set_y(Value:Float):Float
-		{
-			return y = Value;
-		}
-		} /**
-		 * A FlxPoint that calls a function when set_x(), set_y() or set() is called. Used in FlxSpriteGroup.
-		 * IMPORTANT: Calling set(x, y); is MUCH FASTER than setting x and y separately. Needs to be destroyed unlike simple FlxPoints!
-		 */
+	override public function destroy():Void
+	{
+		super.destroy();
+		_setXCallback = null;
+		_setYCallback = null;
+		_setXYCallback = null;
+	}
 
-		class FlxCallbackPoint extends FlxBasePoint
-		{
-			var _setXCallback:FlxPoint->Void;
-			var _setYCallback:FlxPoint->Void;
-			var _setXYCallback:FlxPoint->Void;
-
-			/**
-			 * If you only specify one callback function, then the remaining two will use the same.
-			 *
-			 * @param	setXCallback	Callback for set_x()
-			 * @param	setYCallback	Callback for set_y()
-			 * @param	setXYCallback	Callback for set()
-			 */
-			public function new(setXCallback:FlxPoint->Void, ?setYCallback:FlxPoint->Void, ?setXYCallback:FlxPoint->Void)
-			{
-				super();
-
-				_setXCallback = setXCallback;
-				_setYCallback = setXYCallback;
-				_setXYCallback = setXYCallback;
-
-				if (_setXCallback != null)
-				{
-					if (_setYCallback == null)
-						_setYCallback = setXCallback;
-					if (_setXYCallback == null)
-						_setXYCallback = setXCallback;
-				}
-			}
-
-			override public function set(x:Float = 0, y:Float = 0):FlxCallbackPoint
-			{
-				super.set(x, y);
-				if (_setXYCallback != null)
-					_setXYCallback(this);
-				return this;
-			}
-
-			override function set_x(value:Float):Float
-			{
-				super.set_x(value);
-				if (_setXCallback != null)
-					_setXCallback(this);
-				return value;
-			}
-
-			override function set_y(value:Float):Float
-			{
-				super.set_y(value);
-				if (_setYCallback != null)
-					_setYCallback(this);
-				return value;
-			}
-
-			override public function destroy():Void
-			{
-				super.destroy();
-				_setXCallback = null;
-				_setYCallback = null;
-				_setXYCallback = null;
-			}
-
-			override public function put():Void {} // don't pool FlxCallbackPoints
-		}
+	override public function put():Void {} // don't pool FlxCallbackPoints
+}
