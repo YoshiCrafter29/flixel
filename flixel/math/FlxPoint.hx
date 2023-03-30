@@ -7,31 +7,31 @@ import openfl.geom.Point;
 
 /**
  * 2-dimensional point class
- * 
+ *
  * ## Pooling
  * To avoid creating new instances, unnecessarily, used points can be
  * for later use. Rather than creating a new instance directly, call
  * `FlxPoint.get(x, y)` and it will retrieve a point from the pool, if
  * one exists, otherwise it will create a new instance. Similarly, when
  * you're done using a point, call `myPoint.put()` to place it back.
- * 
+ *
  * You can disable point pooling entirely with `FLX_NO_POINT_POOL`.
- * 
+ *
  * ## Weak points
  * Weak points are points meant for a singular use, rather than calling
  * `put` on every point you `get`, you can create a weak point, and have
  * it placed back once used. All `FlxPoint` methods and Flixel utilities
  * automatically call `putWeak()` on every point passed in.
- * 
+ *
  * In the following example, a weak point is created, and passed into
  * `p.degreesTo` where `putWeak` is called on it, putting it back in the pool.
  *
  * ```haxe
  * var angle = p.degreesTo(FlxPoint.weak(FlxG.mouse.x, FlxG.mouse.y));
  * ```
- * 
+ *
  * ## Overloaded Operators
- * 
+ *
  * - `A += B` adds the value of `B` to `A`
  * - `A -= B` subtracts the value of `B` from `A`
  * - `A *= k` scales `A` by float `k` in both x and y components
@@ -43,7 +43,7 @@ import openfl.geom.Point;
  *
  * Note: that these operators get points from the pool, but do not put
  * points back in the pool, unless they are weak.
- * 
+ *
  * Example: 4 total points are created, but only 3 are put into the pool
  * ```haxe
  * var a = FlxPoint.get(1, 1);
@@ -53,7 +53,7 @@ import openfl.geom.Point;
  * b.put();
  * c.put();
  * ```
- * 
+ *
  * To put all 4 back, it should look like this:
  * ```haxe
  * var a = FlxPoint.get(1, 1);
@@ -65,11 +65,11 @@ import openfl.geom.Point;
  * c.put();
  * d.put();
  * ```
- * 
+ *
  * Otherwise, the remainging points will become garbage, adding to the
  * heap, potentially triggering a garbage collection when you don't want.
  */
-@:forward abstract FlxPoint(FlxBasePoint) to FlxBasePoint from FlxBasePoint 
+@:forward abstract FlxPoint(FlxBasePoint) to FlxBasePoint from FlxBasePoint
 {
 	public static inline var EPSILON:Float = 0.0000001;
 	public static inline var EPSILON_SQUARED:Float = EPSILON * EPSILON;
@@ -142,7 +142,6 @@ import openfl.geom.Point;
 		return result;
 	}
 
-	
 	/**
 	 * Operator that divides a point by float, returning a new point.
 	 */
@@ -185,7 +184,6 @@ import openfl.geom.Point;
 		return a.scale(b);
 	}
 
-	
 	/**
 	 * Operator that adds two points, returning a new point.
 	 */
@@ -684,16 +682,16 @@ import openfl.geom.Point;
 	}
 
 	/** DEPRECATED
-	 * 
+	 *
 	 * Calculates the angle between this and another point. 0 degrees points straight up.
-	 * 
+	 *
 	 * Note: Every other flixel function treats straight right as 0 degrees.
-	 * 
+	 *
 	 * Also Note: The result is very innacurate.
 	 *
 	 * @param   point   The other point.
 	 * @return  The angle in degrees, between -180 and 180.
-	 * 
+	 *
 	 * @see [Flixel 5.0.0 Migration guide](https://github.com/HaxeFlixel/flixel/wiki/Flixel-5.0.0-Migration-guide)
 	 */
 	@:deprecated("angleBetween is deprecated, use degreesTo instead")
@@ -945,7 +943,7 @@ import openfl.geom.Point;
 	 * @param   length   The length to set the point
 	 * @param   radians  The angle to set the point, in radians
 	 * @return  The rotated point
-	 * 
+	 *
 	 * @since 4.10.0
 	 */
 	public function setPolarRadians(length:Float, radians:Float):FlxPoint
@@ -961,7 +959,7 @@ import openfl.geom.Point;
 	 * @param   length  The length to set the point
 	 * @param   degrees The angle to set the point, in degrees
 	 * @return  The rotated point
-	 * 
+	 *
 	 * @since 4.10.0
 	 */
 	public inline function setPolarDegrees(length:Float, degrees:Float):FlxPoint
@@ -1425,7 +1423,7 @@ import openfl.geom.Point;
 
 /**
  * The base class of FlxPoint, just use FlxPoint instead.
- * 
+ *
  * Note to contributors: don't worry about adding functionality to the base class.
  * it's all mostly inlined anyway so there's no runtime definitions for
  * reflection or anything.
@@ -1527,118 +1525,114 @@ class FlxBasePoint implements IFlxPooled
 		{
 			put();
 		}
-		#end
-	}
+		#endxw} /**
+		 * Function to compare this FlxBasePoint to another.
+		 *
+		 * @param   point  The other FlxBasePoint to compare to this one.
+		 * @return  True if the FlxBasePoints have the same x and y value, false otherwise.
+		 */
 
-	/**
-	 * Function to compare this FlxBasePoint to another.
-	 *
-	 * @param   point  The other FlxBasePoint to compare to this one.
-	 * @return  True if the FlxBasePoints have the same x and y value, false otherwise.
-	 */
-	public inline function equals(point:FlxBasePoint):Bool
-	{
-		var result = FlxMath.equal(x, point.x) && FlxMath.equal(y, point.y);
-		point.putWeak();
-		return result;
-	}
-
-	/**
-	 * Necessary for IFlxDestroyable.
-	 */
-	public function destroy() {}
-
-	/**
-	 * Convert object to readable string name. Useful for debugging, save games, etc.
-	 */
-	public inline function toString():String
-	{
-		return FlxStringUtil.getDebugString([LabelValuePair.weak("x", x), LabelValuePair.weak("y", y)]);
-	}
-
-	/**
-	 * Necessary for FlxCallbackPoint.
-	 */
-	function set_x(Value:Float):Float
-	{
-		return x = Value;
-	}
-
-	/**
-	 * Necessary for FlxCallbackPoint.
-	 */
-	function set_y(Value:Float):Float
-	{
-		return y = Value;
-	}
-}
-
-
-/**
- * A FlxPoint that calls a function when set_x(), set_y() or set() is called. Used in FlxSpriteGroup.
- * IMPORTANT: Calling set(x, y); is MUCH FASTER than setting x and y separately. Needs to be destroyed unlike simple FlxPoints!
- */
-class FlxCallbackPoint extends FlxBasePoint
-{
-	var _setXCallback:FlxPoint->Void;
-	var _setYCallback:FlxPoint->Void;
-	var _setXYCallback:FlxPoint->Void;
-
-	/**
-	 * If you only specify one callback function, then the remaining two will use the same.
-	 *
-	 * @param	setXCallback	Callback for set_x()
-	 * @param	setYCallback	Callback for set_y()
-	 * @param	setXYCallback	Callback for set()
-	 */
-	public function new(setXCallback:FlxPoint->Void, ?setYCallback:FlxPoint->Void, ?setXYCallback:FlxPoint->Void)
-	{
-		super();
-
-		_setXCallback = setXCallback;
-		_setYCallback = setXYCallback;
-		_setXYCallback = setXYCallback;
-
-		if (_setXCallback != null)
+		public inline function equals(point:FlxBasePoint):Bool
 		{
-			if (_setYCallback == null)
-				_setYCallback = setXCallback;
-			if (_setXYCallback == null)
-				_setXYCallback = setXCallback;
+			var result = FlxMath.equal(x, point.x) && FlxMath.equal(y, point.y);
+			point.putWeak();
+			return result;
 		}
-	}
 
-	override public function set(x:Float = 0, y:Float = 0):FlxCallbackPoint
-	{
-		super.set(x, y);
-		if (_setXYCallback != null)
-			_setXYCallback(this);
-		return this;
-	}
+		/**
+		 * Necessary for IFlxDestroyable.
+		 */
+		public function destroy() {}
 
-	override function set_x(value:Float):Float
-	{
-		super.set_x(value);
-		if (_setXCallback != null)
-			_setXCallback(this);
-		return value;
-	}
+		/**
+		 * Convert object to readable string name. Useful for debugging, save games, etc.
+		 */
+		public inline function toString():String
+		{
+			return FlxStringUtil.getDebugString([LabelValuePair.weak("x", x), LabelValuePair.weak("y", y)]);
+		}
 
-	override function set_y(value:Float):Float
-	{
-		super.set_y(value);
-		if (_setYCallback != null)
-			_setYCallback(this);
-		return value;
-	}
+		/**
+		 * Necessary for FlxCallbackPoint.
+		 */
+		function set_x(Value:Float):Float
+		{
+			return x = Value;
+		}
 
-	override public function destroy():Void
-	{
-		super.destroy();
-		_setXCallback = null;
-		_setYCallback = null;
-		_setXYCallback = null;
-	}
+		/**
+		 * Necessary for FlxCallbackPoint.
+		 */
+		function set_y(Value:Float):Float
+		{
+			return y = Value;
+		}
+		} /**
+		 * A FlxPoint that calls a function when set_x(), set_y() or set() is called. Used in FlxSpriteGroup.
+		 * IMPORTANT: Calling set(x, y); is MUCH FASTER than setting x and y separately. Needs to be destroyed unlike simple FlxPoints!
+		 */
 
-	override public function put():Void {} // don't pool FlxCallbackPoints
-}
+		class FlxCallbackPoint extends FlxBasePoint
+		{
+			var _setXCallback:FlxPoint->Void;
+			var _setYCallback:FlxPoint->Void;
+			var _setXYCallback:FlxPoint->Void;
+
+			/**
+			 * If you only specify one callback function, then the remaining two will use the same.
+			 *
+			 * @param	setXCallback	Callback for set_x()
+			 * @param	setYCallback	Callback for set_y()
+			 * @param	setXYCallback	Callback for set()
+			 */
+			public function new(setXCallback:FlxPoint->Void, ?setYCallback:FlxPoint->Void, ?setXYCallback:FlxPoint->Void)
+			{
+				super();
+
+				_setXCallback = setXCallback;
+				_setYCallback = setXYCallback;
+				_setXYCallback = setXYCallback;
+
+				if (_setXCallback != null)
+				{
+					if (_setYCallback == null)
+						_setYCallback = setXCallback;
+					if (_setXYCallback == null)
+						_setXYCallback = setXCallback;
+				}
+			}
+
+			override public function set(x:Float = 0, y:Float = 0):FlxCallbackPoint
+			{
+				super.set(x, y);
+				if (_setXYCallback != null)
+					_setXYCallback(this);
+				return this;
+			}
+
+			override function set_x(value:Float):Float
+			{
+				super.set_x(value);
+				if (_setXCallback != null)
+					_setXCallback(this);
+				return value;
+			}
+
+			override function set_y(value:Float):Float
+			{
+				super.set_y(value);
+				if (_setYCallback != null)
+					_setYCallback(this);
+				return value;
+			}
+
+			override public function destroy():Void
+			{
+				super.destroy();
+				_setXCallback = null;
+				_setYCallback = null;
+				_setXYCallback = null;
+			}
+
+			override public function put():Void {} // don't pool FlxCallbackPoints
+		}

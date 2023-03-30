@@ -18,7 +18,7 @@ import flixel.util.FlxStringUtil;
  * At their core `FlxObjects` are just boxes with positions that can move and collide with other
  * objects. Most games utilize `FlxObject's` features through [FlxSprite](https://api.haxeflixel.com/flixel/FlxSprite.html),
  * which extends `FlxObject` directly and adds graphical capabilities.
- * 
+ *
  * ## Motion
  * Whenever `update` is called, objects with `move` set to true will update their positions based
  * on the following properties:
@@ -30,17 +30,17 @@ import flixel.util.FlxStringUtil;
  * - `angle`: The orientation, in degrees, of this `object`. Does not affect collision, mainly
  *            used for `FlxSprite` graphics.
  * - `angularVelocity`: The rotational speed of thiw object in degrees per second.
- * 
+ *
  * ## Overlaps
  * If you're only checking an overlap between two objects you can use `player.overlaps(door)`
  * or `player.overlaps(spikeGroup)`. You can check if two objects or groups of object overlap
  * with [FlxG.overlap](https://api.haxeflixel.com/flixel/FlxG.html#overlap).
- * 
+ *
  * Example:
  * ```haxe
  * if (FlxG.overlap(playerGroup, spikeGroup)) trace("overlap!");
  * ```
- * 
+ *
  * You can also specify a callback to handle which specific objects collided:
  * ```haxe
  * FlxG.overlap(playerGroup, medKitGroup
@@ -51,11 +51,11 @@ import flixel.util.FlxStringUtil;
  *     }
  * );
  * ```
- * 
+ *
  * Additional resources:
  * - [Snippets - Simple Overlap](https://snippets.haxeflixel.com/overlap/simple-overlap/)
  * - [Snippets - Overlap Callbacks](https://snippets.haxeflixel.com/overlap/overlap-callbacks/)
- * 
+ *
  * ## Collision
  * `FlxG.collide` is similar to `FlxG.overlap` except it resolves the overlap by separating their
  * positions before calling the callback. Typically collide is called on an update loop like so:
@@ -65,7 +65,7 @@ import flixel.util.FlxStringUtil;
  * This takes the player's and crate's momentum and previous and current position in consideration
  * when resolving overlaps between them. Like `overlap` collide will return true if any objects
  * were overlapping, and you can specify a callback.
- * 
+ *
  * Additional resources:
  * - [Snippets - 1 to 1 Collision](https://snippets.haxeflixel.com/collision/1-to-1-collision/)
  * - [Demos - FlxCollisions](https://haxeflixel.com/demos/FlxCollisions/)
@@ -200,8 +200,7 @@ class FlxObject extends FlxBasic
 			case ALWAYS: true;
 			case IMMOVABLE: object2.immovable;
 			case HEAVIER: object2.immovable || object2.mass > object1.mass;
-		}
-	}
+		}}
 
 	/**
 	 * Internal function that computes overlap among two objects on the X axis. It also updates the `touching` variable.
@@ -330,7 +329,7 @@ class FlxObject extends FlxBasic
 				#else
 				object1.x -= overlap / 2;
 				object2.x += overlap / 2;
-				
+
 				var momentum = mass1 * vel1 + mass2 * vel2;
 				var newVel1 = (momentum + elasticity1 * mass2 * (vel2 - vel1)) / massSum;
 				var newVel2 = (momentum + elasticity2 * mass1 * (vel1 - vel2)) / massSum;
@@ -512,7 +511,7 @@ class FlxObject extends FlxBasic
 				#else
 				object1.y -= overlap / 2;
 				object2.y += overlap / 2;
-				
+
 				var momentum = mass1 * vel1 + mass2 * vel2;
 				var newVel1 = (momentum + elasticity1 * mass2 * (vel2 - vel1)) / massSum;
 				var newVel2 = (momentum + elasticity2 * mass1 * (vel1 - vel2)) / massSum;
@@ -718,7 +717,7 @@ class FlxObject extends FlxBasic
 	/** DEPRECATED
 	 * Whether this sprite is dragged along with the horizontal movement of objects it collides with
 	 * (makes sense for horizontally-moving platforms in platformers for example).
-	 * 
+	 *
 	 * Apart from having a weird typo, this has been deprecated for collisionXDrag, which allows more options.
 	 */
 	@:deprecated("Use `collisionXDrag`, instead. Note the corrected spelling: `collis(i)onXDrag")
@@ -1092,7 +1091,7 @@ class FlxObject extends FlxBasic
 
 	/**
 	 * Returns the world position of this object.
-	 * 
+	 *
 	 * @param   result  Optional arg for the returning point.
 	 * @return  The world position of this object.
 	 */
@@ -1100,7 +1099,7 @@ class FlxObject extends FlxBasic
 	{
 		if (result == null)
 			result = FlxPoint.get();
-		
+
 		return result.set(x, y);
 	}
 
@@ -1200,7 +1199,7 @@ class FlxObject extends FlxBasic
 	 */
 	public function hurt(damage:Float):Void
 	{
-		health = health - damage;
+		health -= damage;
 		if (health <= 0)
 			kill();
 	}
@@ -1208,7 +1207,7 @@ class FlxObject extends FlxBasic
 	/**
 	 * Centers this `FlxObject` on the screen, either by the x axis, y axis, or both.
 	 *
-	 * @param   axes   On what axes to center the object (e.g. `X`, `Y`, `XY`) - default is both. 
+	 * @param   axes   On what axes to center the object (e.g. `X`, `Y`, `XY`) - default is both.
 	 * @return  This FlxObject for chaining
 	 */
 	public inline function screenCenter(axes:FlxAxes = XY):FlxObject
@@ -1335,7 +1334,7 @@ class FlxObject extends FlxBasic
 
 		return _rect;
 	}
-	
+
 	/**
 	 * Calculates the smallest globally aligned bounding box that encompasses this
 	 * object's width and height, at its current rotation.
@@ -1349,7 +1348,7 @@ class FlxObject extends FlxBasic
 	{
 		if (newRect == null)
 			newRect = FlxRect.get();
-		
+
 		newRect.set(x, y, width, height);
 		return newRect.getRotatedBounds(angle, null, newRect);
 	}

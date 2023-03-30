@@ -117,7 +117,8 @@ class FlxDrawQuadsItem extends FlxDrawBaseItem<FlxDrawQuadsItem>
 			return;
 
 		var shader = shader != null ? shader : graphics.shader;
-		if (shader == null || graphics == null || shader.bitmap == null || graphics.bitmap == null) return;
+		if (shader == null || graphics == null || shader.bitmap == null || graphics.bitmap == null)
+			return;
 		shader.bitmap.input = graphics.bitmap;
 
 		var aaType:Context3DTextureFilter = LINEAR;

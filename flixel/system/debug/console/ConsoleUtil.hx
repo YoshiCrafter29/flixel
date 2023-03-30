@@ -12,7 +12,7 @@ import hscript.Expr;
 import hscript.Parser;
 #end
 
-/** 
+/**
  * A set of helper functions used by the console.
  */
 class ConsoleUtil
