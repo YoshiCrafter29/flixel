@@ -49,8 +49,33 @@ class FlxSkewedSprite extends FlxSprite
 
 	override function drawComplex(camera:FlxCamera):Void
 	{
-		_frame.prepareMatrix(_matrix, FlxFrameAngle.ANGLE_0, checkFlipX(), checkFlipY());
+		_flipX = checkFlipX();
+		_flipY = checkFlipY();
+
+		_flipX = _flipX != camera.flipX;
+		_flipY = _flipY != camera.flipY;
+
+		_frame.prepareMatrix(_matrix, FlxFrameAngle.ANGLE_0, _flipX, _flipY);
 		_matrix.translate(-origin.x, -origin.y);
+
+		if (rotOffsetAngle != null && rotOffsetAngle != angle)
+		{
+			var angleOff = (-angle + rotOffsetAngle) * FlxAngle.TO_RAD;
+			_matrix.rotate(-angleOff);
+			if (useOffsetAsRotOffset)
+				_matrix.translate(-offset.x, -offset.y);
+			else
+				_matrix.translate(-rotOffset.x, -rotOffset.y);
+			_matrix.rotate(angleOff);
+		}
+		else
+		{
+			if (useOffsetAsRotOffset)
+				_matrix.translate(-offset.x, -offset.y);
+			else
+				_matrix.translate(-rotOffset.x, -rotOffset.y);
+		}
+
 		_matrix.scale(scale.x, scale.y);
 
 		if (matrixExposed)
@@ -71,12 +96,17 @@ class FlxSkewedSprite extends FlxSprite
 			_matrix.concat(_skewMatrix);
 		}
 
-		_point.addPoint(origin);
-		if (isPixelPerfectRender(camera))
-			_point.floor();
-
+		_point.add(origin.x, origin.y);
 		_matrix.translate(_point.x, _point.y);
-		camera.drawPixels(_frame, framePixels, _matrix, colorTransform, blend, antialiasing);
+
+		if (isPixelPerfectRender(camera))
+		{
+			_matrix.tx = Math.floor(_matrix.tx);
+			_matrix.ty = Math.floor(_matrix.ty);
+		}
+
+		doAdditionalMatrixStuff(_matrix, camera);
+		camera.drawPixels(_frame, framePixels, _matrix, colorTransform, blend, antialiasing, shader);
 	}
 
 	function updateSkewMatrix():Void
