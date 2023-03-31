@@ -138,6 +138,7 @@ class SoundFrontEnd
 		}
 
 		var sound:FlxSound = list.recycle(FlxSound);
+		sound.persist = false;
 
 		if (EmbeddedSound != null)
 		{
@@ -230,6 +231,7 @@ class SoundFrontEnd
 			EmbeddedSound = cache(EmbeddedSound);
 		}
 		var sound = list.recycle(FlxSound).loadEmbedded(EmbeddedSound, Looped, AutoDestroy, OnComplete);
+		sound.persist = false;
 		return loadHelper(sound, Volume, Group, true);
 	}
 
