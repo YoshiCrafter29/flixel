@@ -7,7 +7,7 @@ import haxe.macro.Expr.Position;
 
 using StringTools;
 
-private enum UserDefines
+enum UserDefines
 {
 	FLX_NO_MOUSE_ADVANCED;
 	FLX_NO_GAMEPAD;
@@ -35,7 +35,7 @@ private enum UserDefines
  * are shortened into a single define to avoid the redundancy
  * that comes with using them frequently.
  */
-private enum HelperDefines
+enum HelperDefines
 {
 	FLX_GAMEPAD;
 	FLX_MOUSE;

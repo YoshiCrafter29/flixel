@@ -618,7 +618,7 @@ class FlxUITooltipManager implements IFlxDestroyable
 	}
 }
 
-private class FlxUITooltipEntry implements IFlxDestroyable
+class FlxUITooltipEntry implements IFlxDestroyable
 {
 	public var obj:FlxObject;
 	public var btn:IFlxUIButton;

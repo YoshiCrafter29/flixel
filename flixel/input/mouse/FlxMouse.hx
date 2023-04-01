@@ -25,7 +25,7 @@ import flash.ui.MouseCursorData;
 #end
 
 @:bitmap("assets/images/ui/cursor.png")
-private class GraphicCursor extends BitmapData {}
+class GraphicCursor extends BitmapData {}
 
 /**
  * This class helps contain and track the mouse pointer in your game.

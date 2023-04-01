@@ -25,10 +25,10 @@ import flixel.util.FlxHorizontalAlign;
 using flixel.util.FlxArrayUtil;
 
 @:bitmap("assets/images/debugger/flixel.png")
-private class GraphicFlixel extends BitmapData {}
+class GraphicFlixel extends BitmapData {}
 
 @:bitmap("assets/images/debugger/buttons/drawDebug.png")
-private class GraphicDrawDebug extends BitmapData {}
+class GraphicDrawDebug extends BitmapData {}
 
 @:bitmap("assets/images/debugger/buttons/log.png")
 @:noCompletion class GraphicLog extends BitmapData {}

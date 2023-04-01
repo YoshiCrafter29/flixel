@@ -104,7 +104,7 @@ class FlxStarField3D extends FlxStarField
 	}
 }
 
-private class FlxStarField extends FlxSprite
+class FlxStarField extends FlxSprite
 {
 	public var bgColor:Int = FlxColor.BLACK;
 
@@ -185,7 +185,7 @@ private class FlxStarField extends FlxSprite
 	}
 }
 
-private class FlxStar
+class FlxStar
 {
 	public var index:Int;
 	public var x:Float;

@@ -410,7 +410,7 @@ class FlxFSMStack<T> extends FlxFSMStackSignal implements IFlxDestroyable
  * Otherwise signals would be type specific, and `FlxFSMStack<A>` could not dispatch
  * to `FlxFSMStack<B>`
  */
-private class FlxFSMStackSignal
+class FlxFSMStackSignal
 {
 	static var _lockSignal:FlxTypedSignal<Int->Void>;
 

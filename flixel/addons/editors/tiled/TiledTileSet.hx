@@ -259,5 +259,5 @@ class TiledTileSet
 	}
 }
 
-private typedef ValidByteArray = #if lime_legacy ByteArray #else ByteArrayData #end;
+typedef ValidByteArray = #if lime_legacy ByteArray #else ByteArrayData #end;
 typedef FlxTiledTileAsset = OneOfTwo<Access, ValidByteArray>;

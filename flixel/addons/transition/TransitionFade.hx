@@ -14,7 +14,7 @@ import openfl.geom.Matrix;
 import openfl.geom.Point;
 
 @:keep @:bitmap("assets/images/transitions/diagonal_gradient.png")
-private class GraphicDiagonalGradient extends BitmapData {}
+class GraphicDiagonalGradient extends BitmapData {}
 
 /**
  *

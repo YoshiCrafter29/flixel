@@ -165,7 +165,7 @@ class ConsoleUtil
  * hscript doesn't use property access by default... have to make our own.
  */
 #if hscript
-private class Interp extends hscript.Interp
+class Interp extends hscript.Interp
 {
 	public function getGlobals():Array<String>
 	{

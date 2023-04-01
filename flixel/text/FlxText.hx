@@ -1113,7 +1113,7 @@ class FlxTextFormat
 	}
 }
 
-private class FlxTextFormatRange
+class FlxTextFormatRange
 {
 	public var range(default, null):FlxRange<Int>;
 	public var format(default, null):FlxTextFormat;
@@ -1198,4 +1198,4 @@ abstract FlxTextAlign(String) from String
 	}
 }
 
-private typedef AlignType = #if openfl_legacy String #else TextFormatAlign #end;
+typedef AlignType = #if openfl_legacy String #else TextFormatAlign #end;

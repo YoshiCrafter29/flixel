@@ -304,7 +304,7 @@ class FlxSimplex
 }
 
 @:arrayAccess
-private abstract SimplexCell(Array<Int>) from Array<Int>
+abstract SimplexCell(Array<Int>) from Array<Int>
 {
 	public var x(get, set):Int;
 
