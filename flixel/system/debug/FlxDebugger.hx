@@ -126,12 +126,19 @@ class FlxDebugger extends Sprite
 		visible = false;
 		tabChildren = false;
 
+		#if openfl_dpi_aware
+		scaleX = scaleY = FlxG.stage.window.scale;
+		#else
+		scaleX = scaleY = 1;
+		#end
+
 		Tooltip.init(this);
 
 		_topBar = new Sprite();
 		_topBar.graphics.beginFill(0x000000, 0xAA / 255);
-		_topBar.graphics.drawRect(0, 0, FlxG.stage.stageWidth, TOP_HEIGHT);
+		_topBar.graphics.drawRect(0, 0, 1, 1);
 		_topBar.graphics.endFill();
+		_topBar.height = TOP_HEIGHT;
 		addChild(_topBar);
 
 		var txt = new TextField();
@@ -325,14 +332,23 @@ class FlxDebugger extends Sprite
 
 	public function onResize(Width:Float, Height:Float):Void
 	{
+		#if openfl_dpi_aware
+		Width = Width / FlxG.stage.window.scale;
+		Height = Height / FlxG.stage.window.scale;
+		#end
+
 		_screen.x = Width;
 		_screen.y = Height;
 
 		updateBounds();
-		_topBar.width = FlxG.stage.stageWidth;
+		_topBar.width = Width;
 		resetButtonLayout();
 		resetLayout();
+		#if openfl_dpi_aware
+		scaleX = scaleY = FlxG.stage.window.scale;
+		#else
 		scaleX = scaleY = 1;
+		#end
 		x = -FlxG.scaleMode.offset.x;
 		y = -FlxG.scaleMode.offset.y;
 	}
@@ -373,10 +389,10 @@ class FlxDebugger extends Sprite
 	{
 		hAlignButtons(_buttons[FlxHorizontalAlign.LEFT], 10, true, 10);
 
-		var offset = FlxG.stage.stageWidth * 0.5 - hAlignButtons(_buttons[FlxHorizontalAlign.CENTER], 10, false) * 0.5;
+		var offset = FlxG.stage.stageWidth / scaleX * 0.5 - hAlignButtons(_buttons[FlxHorizontalAlign.CENTER], 10, false) * 0.5;
 		hAlignButtons(_buttons[FlxHorizontalAlign.CENTER], 10, true, offset);
 
-		var offset = FlxG.stage.stageWidth - hAlignButtons(_buttons[FlxHorizontalAlign.RIGHT], 10, false);
+		var offset = FlxG.stage.stageWidth / scaleX - hAlignButtons(_buttons[FlxHorizontalAlign.RIGHT], 10, false);
 		hAlignButtons(_buttons[FlxHorizontalAlign.RIGHT], 10, true, offset);
 	}
 
